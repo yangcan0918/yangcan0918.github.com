@@ -1,0 +1,469 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>运维工程师面试题大全 | linux运维学习与交流中心</title>
+  <meta name="author" content="snom">
+  
+  <meta name="description" content="本博客主要用来记录linux相关的文章">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="运维工程师面试题大全"/>
+  <meta property="og:site_name" content="linux运维学习与交流中心"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+ <link href="/favicon.ico" rel="icon" type="image/x-ico"> 
+  <link rel="alternate" href="/atom.xml" title="linux运维学习与交流中心" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">linux运维学习与交流中心</a></h1>
+  <h2><a href="/">技术永无止境</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">存档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/todolist">ToDo</a></li>
+    
+      <li><a href="/Photos">Photos</a></li>
+    
+      <li> <a href="/atom.xml">RSS</a> </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2014-11-01T07:52:04.000Z"><a href="/2014/11/01/sa运维工程师面试题大全/">11月 1 2014</a></time>
+      
+      
+  
+    <h1 class="title">运维工程师面试题大全</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="面试题">面试题</h3>
+<h4 id="写一个脚本查找最后创建时间是3天前，后缀是*-log的文件并删除。">写一个脚本查找最后创建时间是3天前，后缀是*.log的文件并删除。</h4>
+<pre><code>find / -name <span class="string">"\*.log"</span>-ctime +<span class="number">3</span> -exec rm <span class="operator">-f</span> {} \;
+</code></pre><h4 id="写一个脚本将某目录下大于100k的文件移动至/tmp下。">写一个脚本将某目录下大于100k的文件移动至/tmp下。</h4>
+<pre><code><span class="keyword">for</span> i <span class="keyword">in</span> `find /test -type f -size +<span class="number">100</span>k`;<span class="keyword">do</span> <span class="built_in">cd</span> /test &amp;&amp; mv <span class="variable">$i</span> /tmp;<span class="keyword">done</span>
+</code></pre><p><a id="more"></a></p>
+<h4 id="写一个脚本将数据库备份并打包至远程服务器192-168-1-1_/backup目录下。">写一个脚本将数据库备份并打包至远程服务器192.168.1.1 /backup目录下。</h4>
+<pre><code>mount 192.168.1.1:/<span class="operator"><span class="keyword">backup</span> /mnt
+cd /mnt
+/usr/<span class="keyword">local</span>/mysql/<span class="keyword">bin</span>/mysqldump -hlocalhost -uroot test &gt;test.<span class="keyword">sql</span>
+tar czf test.<span class="keyword">sql</span>.tar.gz test.<span class="keyword">sql</span>
+rm -f test.<span class="keyword">sql</span></span>
+</code></pre><h4 id="写一个防火墙配置脚本，只允许远程主机访问本机的80端口。">写一个防火墙配置脚本，只允许远程主机访问本机的80端口。</h4>
+<pre><code>iptables -P INPUT ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -F
+iptables -X
+iptables -A INPUT -i eth0 -p tcp <span class="comment">--dport 80 -j ACCEPT</span>
+iptables -P INPUT <span class="operator"><span class="keyword">DROP</span></span>
+</code></pre><h4 id="写一个脚本进行nginx日志统计，得到访问ip最多的前10个(nginx日志路径：/home/logs/nginx/default/access-log)。">写一个脚本进行nginx日志统计，得到访问ip最多的前10个(nginx日志路径：/home/logs/nginx/default/access.log)。</h4>
+<pre><code>awk '{a[$<span class="number">1</span>]++}<span class="type">END</span>{<span class="keyword">for</span> (j <span class="keyword">in</span> a) <span class="built_in">print</span> a[j],j}' /home/logs/nginx/<span class="keyword">default</span>/access.log|<span class="built_in">sort</span> -nr|head -<span class="number">10</span>
+</code></pre><h4 id="写出下列命令的含义">写出下列命令的含义</h4>
+<pre><code>（<span class="number">1</span>）MaxKeepAliveRequests    <span class="number">100</span> 连接的最大请求数
+（<span class="number">2</span>）<span class="keyword">Options</span> FollowSymLinks  允许<span class="number">192.168</span>.<span class="number">1.1</span>可以列目录
+           Order Deny Allow
+           Deny <span class="keyword">from</span> all
+    Allow <span class="keyword">from</span> <span class="number">192.168</span>.<span class="number">1.1</span>
+</code></pre><h4 id="写一个脚本把指定文件里的/usr/local替换为别的目录。">写一个脚本把指定文件里的/usr/local替换为别的目录。</h4>
+<pre><code><span class="title">sed</span> <span class="string">'s:/user/local:/tmp:g'</span> 　filename
+</code></pre><h4 id="简要描述Linux的启动过程？">简要描述Linux的启动过程？</h4>
+<pre><code><span class="comment">BIOS启动引导(从mbr中装载启动管理器grub)</span><span class="literal">-</span><span class="literal">-</span><span class="literal">-</span><span class="literal">-</span><span class="comment">GRUB启动引导(装载kernel和initrd到内存)</span><span class="literal">-</span><span class="literal">-</span><span class="literal">-</span><span class="literal">-</span><span class="literal">-</span><span class="comment">内核启动参数</span><span class="literal">-</span><span class="comment">sys</span> <span class="comment">init初始化</span><span class="string">.</span><span class="string">.</span>
+</code></pre><h4 id="简要叙述下列端口所运行的服务">简要叙述下列端口所运行的服务</h4>
+<pre><code><span class="number">21</span>、<span class="number">22</span>、<span class="number">23</span>、<span class="number">25</span>、<span class="number">110</span>、<span class="number">143</span>、<span class="number">873</span>、<span class="number">3306</span>     <span class="keyword">ftp</span> ssh telnet  snmp  pop3 IMAP  rsync
+</code></pre><h4 id="TCP断头最小长度是_64字节？">TCP断头最小长度是<em>_64</em>字节？</h4>
+<h4 id="让某普通用户能进行cp_/dir1/file1_/dir2的命令时，请说明dir1_file1最小具有什么权限？">让某普通用户能进行cp /dir1/file1 /dir2的命令时，请说明dir1 file1最小具有什么权限？</h4>
+<pre><code><span class="literal">rx</span>
+</code></pre><h4 id="简述TCP三次握手的过程">简述TCP三次握手的过程</h4>
+<pre><code>客户端发送请求SYN,服务器端接收请求确认并回应SYN+ACK,客户端发回ACK回应..    
+</code></pre><h4 id="如何将本地80端口的请求转发到8080端口，当前主机IP为192-168-2-1_？">如何将本地80端口的请求转发到8080端口，当前主机IP为192.168.2.1 ？</h4>
+<pre><code><span class="title">iptables</span> -t nat -A PREROUTING -d <span class="number">192.168.10.10</span> -p tcp --dport <span class="number">80</span> -j DNAT --to-destination <span class="number">192.168.10.10:8080</span>
+</code></pre><h4 id="通过Apache访问日志access-log_统计IP和每个地址访问的次数，按从大到小前10名？">通过Apache访问日志access.log 统计IP和每个地址访问的次数，按从大到小前10名？</h4>
+<pre><code><span class="keyword">cat</span> access_log | awk <span class="string">'{print $1}'</span> | <span class="built_in">sort</span> | uniq -<span class="keyword">c</span> | <span class="built_in">sort</span> -nr
+</code></pre><h4 id="编写shell脚本，获取本机的网络地址。比如IP地址是192-168-100-2/255-255-255-0，那么它的网络地址是192-168-100-1/255-255-255-0">编写shell脚本，获取本机的网络地址。比如IP地址是192.168.100.2/255.255.255.0，那么它的网络地址是192.168.100.1/255.255.255.0</h4>
+<h3 id="非常好的十道shell">非常好的十道shell</h3>
+<h4 id="编写个shell脚本将当前目录下大于10K的文件转移到/tmp目录下">编写个shell脚本将当前目录下大于10K的文件转移到/tmp目录下</h4>
+<pre><code>for FileName in <span class="smartquote">`ls -l | awk '</span>$5&gt;10240 {print $9}<span class="emphasis">'`
+ do
+ mv $FileName /tmp
+ done</span>
+</code></pre><h4 id="用Shell编程，判断一文件是不是字符设备文件，如果是将其拷贝到_/dev_目录下。">用Shell编程，判断一文件是不是字符设备文件，如果是将其拷贝到 /dev 目录下。</h4>
+<pre><code><span class="shebang">#!/bin/sh
+</span>
+FILENAME=
+
+<span class="built_in">echo</span> “Input file name：”
+
+<span class="built_in">read</span> FILENAME
+
+<span class="keyword">if</span> [ -c <span class="string">"<span class="variable">$FILENAME</span>"</span> ]
+
+<span class="keyword">then</span>
+
+cp <span class="variable">$FILENAME</span> /dev
+
+<span class="keyword">fi</span>
+</code></pre><h4 id="设计一个shell程序，添加一个新组为class1，然后添加属于这个组的30个用户，用户名的形式为stdxx，其中xx从01到30。">设计一个shell程序，添加一个新组为class1，然后添加属于这个组的30个用户，用户名的形式为stdxx，其中xx从01到30。</h4>
+<pre><code><span class="shebang">#!/bin/sh
+</span>
+i=<span class="number">1</span>
+
+groupadd class1
+
+<span class="keyword">while</span> [ <span class="variable">$i</span> -le <span class="number">30</span> ]
+
+<span class="keyword">do</span>
+
+<span class="keyword">if</span> [ <span class="variable">$i</span> -le <span class="number">9</span> ] ;<span class="keyword">then</span>
+
+USERNAME=stu0<span class="variable">${i}</span>
+
+<span class="keyword">else</span>
+
+USERNAME=stu<span class="variable">${i}</span>
+
+<span class="keyword">fi</span>
+
+useradd <span class="variable">$USERNAME</span>
+
+mkdir /home/<span class="variable">$USERNAME</span>
+
+chown -R <span class="variable">$USERNAME</span> /home/<span class="variable">$USERNAME</span>
+
+chgrp -R class1 /home/<span class="variable">$USERNAME</span>
+
+i=$((<span class="variable">$i</span>+<span class="number">1</span>))
+
+<span class="keyword">done</span>
+</code></pre><h4 id="编写shell程序，实现自动删除50个账号的功能。账号名为stud1至stud50。">编写shell程序，实现自动删除50个账号的功能。账号名为stud1至stud50。</h4>
+<pre><code><span class="shebang">#!/bin/sh
+</span>
+i=<span class="number">1</span>
+
+<span class="keyword">while</span> [ <span class="variable">$i</span> -le <span class="number">50</span> ]
+
+<span class="keyword">do</span>
+
+userdel -r stud<span class="variable">${i}</span>
+
+i=$((<span class="variable">$i</span>+<span class="number">1</span> ))
+
+<span class="keyword">done</span>
+</code></pre><h4 id="某系统管理员需每天做一定的重复工作，请按照下列要求，编制一个解决_方案_：">某系统管理员需每天做一定的重复工作，请按照下列要求，编制一个解决 方案 ：</h4>
+<p>（1）在下午4 :50删除/abc目录下的全部子目录和全部文件；</p>
+<p>（2）从早8:00～下午6:00每小时读取/xyz目录下x1文件中每行第一个域的全部数据加入到/backup目录下的bak01.txt文件内；</p>
+<p>（3）每逢星期一下午5:50将/data目录下的所有目录和文件归档并压缩为文件：backup.tar.gz；</p>
+<p>（4）在下午5:55将IDE接口的CD-ROM卸载（假设：CD-ROM的设备名为hdc）；</p>
+<p>（5）在早晨8:00前开机后启动。    </p>
+<pre><code>用vi创建编辑一个名为prgx的crontab文件；
+
+prgx文件的内容：
+
+50 16 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> rm -r /abc/<span class="keyword">*</span>
+
+0 8-18/1 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> cut -f1 /xyz/x1 &gt;;&gt;; /backup/bak01.txt
+
+50 17 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> tar zcvf backup.tar.gz /data
+
+55 17 <span class="keyword">*</span> <span class="keyword">*</span> <span class="keyword">*</span> umount /dev/hdc
+
+由超级用户登录，用crontab执行 prgx文件中的内容：
+
+root<span class="comment">@xxx:#crontab prgx；在每日早晨8:00之前开机后即可自动启动crontab。</span>
+</code></pre><h4 id="设计一个shell程序，在每月第一天备份并压缩/etc目录的所有内容，存放在/root/bak目录里，且文件名为如下形式yymmdd_etc，yy为年，mm为月，dd为日。Shell程序fileback存放在/usr/bin目录下。">设计一个shell程序，在每月第一天备份并压缩/etc目录的所有内容，存放在/root/bak目录里，且文件名为如下形式yymmdd_etc，yy为年，mm为月，dd为日。Shell程序fileback存放在/usr/bin目录下。</h4>
+<p>1）编写shell程序fileback：</p>
+<pre><code><span class="shebang">#!/bin/sh
+</span>
+DIRNAME=`ls /root | grep bak`
+
+<span class="keyword">if</span> [ -z <span class="string">"<span class="variable">$DIRNAME</span>"</span> ] ; <span class="keyword">then</span>
+
+mkdir /root/bak
+
+<span class="built_in">cd</span> /root/bak
+
+<span class="keyword">fi</span>
+
+YY=`date +%y`
+
+MM=`date +%m`
+
+DD=`date +%d`
+
+BACKETC=<span class="variable">$YY</span><span class="variable">$MM</span><span class="variable">$DD_etc</span>.tar.gz
+
+tar zcvf <span class="variable">$BACKETC</span> /etc
+
+<span class="built_in">echo</span> <span class="string">"fileback finished!"</span>
+
+（<span class="number">2</span>）编写任务定时器：
+
+<span class="built_in">echo</span> <span class="string">"0 0 1 * * /bin/sh /usr/bin/fileback"</span> &gt;; /root/    etcbakcron
+
+crontab /root/etcbakcron
+
+或使用crontab <span class="operator">-e</span> 命令添加定时任务：
+
+<span class="number">0</span> <span class="number">1</span> * * * /bin/sh /usr/bin/fileback    
+</code></pre><h4 id="有一普通用户想在每周日凌晨零点零分定期备份/user/backup到/tmp目录下，该用户应如何做？">有一普通用户想在每周日凌晨零点零分定期备份/user/backup到/tmp目录下，该用户应如何做？</h4>
+<pre><code>（<span class="number">1</span>）第一种方法：
+
+用户应使用crontab –<span class="keyword">e</span> 命令创建crontab文件。格式如下：
+
+<span class="number">0</span> <span class="number">0</span> * * <span class="keyword">sun</span> <span class="keyword">cp</span> –<span class="keyword">r</span> /user/backup /tmp
+
+（<span class="number">2</span>）第二种方法：
+
+用户先在自己目录下新建文件<span class="keyword">file</span>，文件内容如下：
+
+<span class="number">0</span> * * <span class="keyword">sun</span> <span class="keyword">cp</span> –<span class="keyword">r</span> /user/backup /tmp
+
+然后执行 crontab <span class="keyword">file</span> 使生效。
+</code></pre><h4 id="设计一个Shell程序，在/userdata目录下建立50个目录，即user1～user50，并设置每个目录的权限，其中其他用户的权限为：读；文件所有者的权限为：读、写、执行；文件所有者所在组的权限为：读、执行。">设计一个Shell程序，在/userdata目录下建立50个目录，即user1～user50，并设置每个目录的权限，其中其他用户的权限为：读；文件所有者的权限为：读、写、执行；文件所有者所在组的权限为：读、执行。</h4>
+<p> 建立程序 Pro16如下：</p>
+<pre><code><span class="shebang">#!/bin/sh
+</span>
+i=<span class="number">1</span>
+
+<span class="keyword">while</span> [ i -le <span class="number">50</span> ]
+
+<span class="keyword">do</span>
+
+<span class="keyword">if</span> [ <span class="operator">-d</span> /userdata ];<span class="keyword">then</span>
+
+mkdir -p -m <span class="number">754</span> /userdata/user<span class="variable">$i</span>   加上-m <span class="number">754</span> 就不用写下面那一句了  -p 是递归建立目录
+
+<span class="comment">#chmod 754 /userdata/user$i</span>
+
+<span class="built_in">echo</span> <span class="string">"user<span class="variable">$i</span>"</span>
+
+<span class="built_in">let</span> <span class="string">"i = i + 1"</span> （或i=$((<span class="variable">$i</span>+<span class="number">1</span>))
+
+<span class="keyword">else</span>
+
+mkdir /userdata
+
+mkdir -p -m /userdata/user<span class="variable">$i</span>
+
+<span class="comment">#chmod 754 /userdata/user$i</span>
+
+<span class="built_in">echo</span> <span class="string">"user<span class="variable">$i</span>"</span>
+
+<span class="built_in">let</span> <span class="string">"i = i + 1"</span> （或i=$（（<span class="variable">$i</span>＋<span class="number">1</span>））
+
+<span class="keyword">fi</span>
+
+<span class="keyword">done</span>    
+</code></pre>
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/面试题/">面试题</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/运维/">运维</a>, <a href="/tags/面试/">面试</a>
+  </div>
+
+	
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    <a href="/2014/11/01/mac上安装nginx、mysql、php-fpm/" class="alignleft prev" >上一页</a>
+    
+    
+    <a href="/2014/11/01/常用网址大全/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<section id="comment">
+<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yangcan"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:www.yangcan.me">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/cache/">cache</a><small>1</small></li>
+  
+    <li><a href="/categories/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/categories/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/categories/mac/">mac</a><small>1</small></li>
+  
+    <li><a href="/categories/php/">php</a><small>2</small></li>
+  
+    <li><a href="/categories/命令/">命令</a><small>2</small></li>
+  
+    <li><a href="/categories/生活/">生活</a><small>1</small></li>
+  
+    <li><a href="/categories/面试题/">面试题</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/cmd/">cmd</a><small>1</small></li>
+  
+    <li><a href="/tags/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/tags/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/mongo/">mongo</a><small>2</small></li>
+  
+    <li><a href="/tags/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/tags/nginx/">nginx</a><small>1</small></li>
+  
+    <li><a href="/tags/php/">php</a><small>3</small></li>
+  
+    <li><a href="/tags/redis/">redis</a><small>1</small></li>
+  
+    <li><a href="/tags/website/">website</a><small>1</small></li>
+  
+    <li><a href="/tags/wget/">wget</a><small>1</small></li>
+  
+    <li><a href="/tags/虚拟机/">虚拟机</a><small>1</small></li>
+  
+    <li><a href="/tags/运维/">运维</a><small>1</small></li>
+  
+    <li><a href="/tags/面试/">面试</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/cmd/" style="font-size: 10.00px;">cmd</a><a href="/tags/docker/" style="font-size: 10.00px;">docker</a><a href="/tags/hexo/" style="font-size: 10.00px;">hexo</a><a href="/tags/mongo/" style="font-size: 15.00px;">mongo</a><a href="/tags/mysql/" style="font-size: 10.00px;">mysql</a><a href="/tags/nginx/" style="font-size: 10.00px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/redis/" style="font-size: 10.00px;">redis</a><a href="/tags/website/" style="font-size: 10.00px;">website</a><a href="/tags/wget/" style="font-size: 10.00px;">wget</a><a href="/tags/虚拟机/" style="font-size: 10.00px;">虚拟机</a><a href="/tags/运维/" style="font-size: 10.00px;">运维</a><a href="/tags/面试/" style="font-size: 10.00px;">面试</a>
+  </div>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=3254648682&verifier=c306487b&dpc=1"></iframe>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+<li><a href="http://zipperary.com/" title="Zippera's Blog">Zippera</a></li>
+</ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2014 snom
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff501752a59d5d204ac71a701b1bd2050' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+</body>
+</html>

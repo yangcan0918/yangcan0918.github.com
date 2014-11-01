@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>wget命令的使用 | linux运维学习与交流中心</title>
+  <meta name="author" content="snom">
+  
+  <meta name="description" content="本博客主要用来记录linux相关的文章">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="wget命令的使用"/>
+  <meta property="og:site_name" content="linux运维学习与交流中心"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+ <link href="/favicon.ico" rel="icon" type="image/x-ico"> 
+  <link rel="alternate" href="/atom.xml" title="linux运维学习与交流中心" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">linux运维学习与交流中心</a></h1>
+  <h2><a href="/">技术永无止境</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">存档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/todolist">ToDo</a></li>
+    
+      <li><a href="/Photos">Photos</a></li>
+    
+      <li> <a href="/atom.xml">RSS</a> </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2014-11-01T07:52:04.000Z"><a href="/2014/11/01/wget命令的使用/">11月 1 2014</a></time>
+      
+      
+  
+    <h1 class="title">wget命令的使用</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="格式">格式</h2>
+<pre><code>wget [<span class="keyword">option</span>]   URL 
+</code></pre><h2 id="记录和输入文件">记录和输入文件</h2>
+<a id="more"></a>
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">-<span class="ruby"><span class="constant">O</span>, –output-file=<span class="constant">FILE</span> 把记录写到<span class="constant">FILE</span>文件中</span></div><div class="line">-<span class="ruby">a, –append-output=<span class="constant">FILE</span> 把记录追加到<span class="constant">FILE</span>文件中</span></div><div class="line">-<span class="ruby">d, –debug 打印调试输出</span></div><div class="line">-<span class="ruby">q, –quiet 安静模式(没有输出)</span></div><div class="line">-<span class="ruby">v, –verbose 冗长模式(这是缺省设置)</span></div><div class="line">-<span class="ruby">nv, –non-verbose 关掉冗长模式，但不是安静模式</span></div><div class="line">-<span class="ruby">i, –input-file=<span class="constant">FILE</span> 下载在<span class="constant">FILE</span>文件中出现的<span class="constant">URLs</span></span></div><div class="line">-<span class="ruby"><span class="constant">F</span>, –force-html 把输入文件当作<span class="constant">HTML</span>格式文件对待</span></div><div class="line">-<span class="ruby"><span class="constant">B</span>, –base=<span class="constant">URL</span> 将<span class="constant">URL</span>作为在-<span class="constant">F</span> -i参数指定的文件中出现的相对链接的前缀</span></div><div class="line">–sslcertfile=FILE 可选客户端证书</div><div class="line">–sslcertkey=KEYFILE 可选客户端证书的KEYFILE</div><div class="line">–egd-file=FILE 指定EGD socket的文件名</div></pre></td></tr></table></figure>
+
+<h2 id="下载">下载</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">–bind-address=ADDRESS</div><div class="line">指定本地使用地址(主机名或IP，当本地有多个IP或名字时使用)</div><div class="line">-<span class="ruby">t, –tries=<span class="constant">NUMBER</span> 设定最大尝试链接次数(<span class="number">0</span> 表示无限制).</span></div><div class="line">-<span class="ruby"><span class="constant">O</span> –output-document=<span class="constant">FILE</span> 把文档写到<span class="constant">FILE</span>文件中</span></div><div class="line">-<span class="ruby">nc, –no-clobber 不要覆盖存在的文件或使用.<span class="comment">#前缀</span></span></div><div class="line">-<span class="ruby">c, –continue 接着下载没下载完的文件</span></div><div class="line">–progress=TYPE 设定进程条标记</div><div class="line">-<span class="ruby"><span class="constant">N</span>, –timestamping 不要重新下载文件除非比本地文件新</span></div><div class="line">-<span class="ruby"><span class="constant">S</span>, –server-response 打印服务器的回应</span></div><div class="line">–spider 不下载任何东西</div><div class="line">-<span class="ruby"><span class="constant">T</span>, –timeout=<span class="constant">SECONDS</span> 设定响应超时的秒数</span></div><div class="line">-<span class="ruby">w, –wait=<span class="constant">SECONDS</span> 两次尝试之间间隔<span class="constant">SECONDS</span>秒</span></div><div class="line">–waitretry=SECONDS 在重新链接之间等待1…SECONDS秒</div><div class="line">–random-wait 在下载之间等待0…2*WAIT秒</div><div class="line">-<span class="ruby"><span class="constant">Y</span>, –proxy=on/off 打开或关闭代理</span></div><div class="line">-<span class="ruby"><span class="constant">Q</span>, –quota=<span class="constant">NUMBER</span> 设置下载的容量限制</span></div><div class="line">–limit-rate=RATE 限定下载输率</div></pre></td></tr></table></figure>
+
+<h2 id="目录">目录</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">-<span class="ruby">nd –no-directories 不创建目录</span></div><div class="line">-<span class="ruby">x, –force-directories 强制创建目录</span></div><div class="line">-<span class="ruby">nH, –no-host-directories 不创建主机目录</span></div><div class="line">-<span class="ruby"><span class="constant">P</span>, –directory-prefix=<span class="constant">PREFIX</span> 将文件保存到目录 <span class="constant">PREFIX</span>/…</span></div><div class="line">–cut-dirs=NUMBER 忽略 NUMBER层远程目录</div></pre></td></tr></table></figure>
+
+<h2 id="HTTP_选项">HTTP 选项</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">–<span class="variable">http-user=</span>USER 设定HTTP用户名为 USER.</div><div class="line">–<span class="variable">http-passwd=</span>PASS 设定http密码为 PASS.</div><div class="line">-C, –<span class="variable">cache=</span>on/off 允许/不允许服务器端的数据缓存 (一般情况下允许).</div><div class="line">-E, –html-extension 将所有text/html文档以.html扩展名保存</div><div class="line">–ignore-length 忽略 `Content-Length’头域</div><div class="line">–<span class="variable">header=</span>STRING 在headers中插入字符串 STRING</div><div class="line">–<span class="variable">proxy-user=</span>USER 设定代理的用户名为 USER</div><div class="line">–<span class="variable">proxy-passwd=</span>PASS 设定代理的密码为 PASS</div><div class="line">–<span class="variable">referer=</span>URL 在HTTP请求中包含 `Referer: URL’头</div><div class="line">-s, –save-headers 保存HTTP头到文件</div><div class="line">-U, –<span class="variable">user-agent=</span>AGENT 设定代理的名称为 AGENT而不是 Wget/VERSION.</div><div class="line">–no-http-keep-alive 关闭 HTTP活动链接 (永远链接).</div><div class="line">–<span class="variable">cookies=</span>off 不使用 cookies.</div><div class="line">–<span class="variable">load-cookies=</span>FILE 在开始会话前从文件 FILE中加载cookie</div><div class="line">–<span class="variable">save-cookies=</span>FILE 在会话结束后将 cookies保存到 FILE文件中</div></pre></td></tr></table></figure>
+
+<h2 id="FTP_选项">FTP 选项</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">-<span class="ruby">nr, –dont-remove-listing 不移走 `.listing’文件</span></div><div class="line">-<span class="ruby">g, –glob=on/off 打开或关闭文件名的 globbing机制</span></div><div class="line">–passive-ftp 使用被动传输模式 (缺省值).</div><div class="line">–active-ftp 使用主动传输模式</div><div class="line">–retr-symlinks 在递归的时候，将链接指向文件(而不是目录)</div></pre></td></tr></table></figure>
+
+<h2 id="递归下载">递归下载</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">-<span class="ruby">r, –recursive 递归下载－－慎用!</span></div><div class="line">-<span class="ruby">l, –level=<span class="constant">NUMBER</span> 最大递归深度 (inf 或 <span class="number">0</span> 代表无穷).</span></div><div class="line">–delete-after 在现在完毕后局部删除文件</div><div class="line">-<span class="ruby">k, –convert-links 转换非相对链接为相对链接</span></div><div class="line">-<span class="ruby"><span class="constant">K</span>, –backup-converted 在转换文件<span class="constant">X</span>之前，将之备份为 <span class="constant">X</span>.orig</span></div><div class="line">-<span class="ruby">m, –mirror 等价于 -r -<span class="constant">N</span> -l inf -nr.</span></div><div class="line">-<span class="ruby">p, –page-requisites 下载显示<span class="constant">HTML</span>文件的所有图片</span></div></pre></td></tr></table></figure>
+
+<h2 id="递归下载中的包含和不包含(accept/reject)">递归下载中的包含和不包含(accept/reject)</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">-<span class="ruby"><span class="constant">A</span>, –accept=<span class="constant">LIST</span> 分号分隔的被接受扩展名的列表</span></div><div class="line">-<span class="ruby"><span class="constant">R</span>, –reject=<span class="constant">LIST</span> 分号分隔的不被接受的扩展名的列表</span></div><div class="line">-<span class="ruby"><span class="constant">D</span>, –domains=<span class="constant">LIST</span> 分号分隔的被接受域的列表</span></div><div class="line">–exclude-domains=LIST 分号分隔的不被接受的域的列表</div><div class="line">–follow-ftp 跟踪HTML文档中的FTP链接</div><div class="line">–follow-tags=LIST 分号分隔的被跟踪的HTML标签的列表</div><div class="line">-<span class="ruby"><span class="constant">G</span>, –ignore-tags=<span class="constant">LIST</span> 分号分隔的被忽略的<span class="constant">HTML</span>标签的列表</span></div><div class="line">-<span class="ruby"><span class="constant">H</span>, –span-hosts 当递归时转到外部主机</span></div><div class="line">-<span class="ruby"><span class="constant">L</span>, –relative 仅仅跟踪相对链接</span></div><div class="line">-<span class="ruby"><span class="constant">I</span>, –<span class="keyword">include</span>-directories=<span class="constant">LIST</span> 允许目录的列表</span></div><div class="line">-<span class="ruby"><span class="constant">X</span>, –exclude-directories=<span class="constant">LIST</span> 不被包含目录的列表</span></div><div class="line">-<span class="ruby">np, –no-parent 不要追溯到父目录</span></div></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/命令/">命令</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/wget/">wget</a>
+  </div>
+
+	
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    <a href="/2014/11/01/我也来学习一下docker/" class="alignleft prev" >上一页</a>
+    
+    
+    <a href="/2014/11/01/curl命令常用参数的使用/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<section id="comment">
+<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yangcan"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:www.yangcan.me">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/cache/">cache</a><small>1</small></li>
+  
+    <li><a href="/categories/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/categories/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/categories/mac/">mac</a><small>1</small></li>
+  
+    <li><a href="/categories/php/">php</a><small>2</small></li>
+  
+    <li><a href="/categories/命令/">命令</a><small>2</small></li>
+  
+    <li><a href="/categories/生活/">生活</a><small>1</small></li>
+  
+    <li><a href="/categories/面试题/">面试题</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/cmd/">cmd</a><small>1</small></li>
+  
+    <li><a href="/tags/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/tags/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/mongo/">mongo</a><small>2</small></li>
+  
+    <li><a href="/tags/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/tags/nginx/">nginx</a><small>1</small></li>
+  
+    <li><a href="/tags/php/">php</a><small>3</small></li>
+  
+    <li><a href="/tags/redis/">redis</a><small>1</small></li>
+  
+    <li><a href="/tags/website/">website</a><small>1</small></li>
+  
+    <li><a href="/tags/wget/">wget</a><small>1</small></li>
+  
+    <li><a href="/tags/虚拟机/">虚拟机</a><small>1</small></li>
+  
+    <li><a href="/tags/运维/">运维</a><small>1</small></li>
+  
+    <li><a href="/tags/面试/">面试</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/cmd/" style="font-size: 10.00px;">cmd</a><a href="/tags/docker/" style="font-size: 10.00px;">docker</a><a href="/tags/hexo/" style="font-size: 10.00px;">hexo</a><a href="/tags/mongo/" style="font-size: 15.00px;">mongo</a><a href="/tags/mysql/" style="font-size: 10.00px;">mysql</a><a href="/tags/nginx/" style="font-size: 10.00px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/redis/" style="font-size: 10.00px;">redis</a><a href="/tags/website/" style="font-size: 10.00px;">website</a><a href="/tags/wget/" style="font-size: 10.00px;">wget</a><a href="/tags/虚拟机/" style="font-size: 10.00px;">虚拟机</a><a href="/tags/运维/" style="font-size: 10.00px;">运维</a><a href="/tags/面试/" style="font-size: 10.00px;">面试</a>
+  </div>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=3254648682&verifier=c306487b&dpc=1"></iframe>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+<li><a href="http://zipperary.com/" title="Zippera's Blog">Zippera</a></li>
+</ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2014 snom
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff501752a59d5d204ac71a701b1bd2050' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+</body>
+</html>

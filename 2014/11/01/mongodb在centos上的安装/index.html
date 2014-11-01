@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>mongodb在centos上的安装 | linux运维学习与交流中心</title>
+  <meta name="author" content="snom">
+  
+  <meta name="description" content="本博客主要用来记录linux相关的文章">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="mongodb在centos上的安装"/>
+  <meta property="og:site_name" content="linux运维学习与交流中心"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+ <link href="/favicon.ico" rel="icon" type="image/x-ico"> 
+  <link rel="alternate" href="/atom.xml" title="linux运维学习与交流中心" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">linux运维学习与交流中心</a></h1>
+  <h2><a href="/">技术永无止境</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">存档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/todolist">ToDo</a></li>
+    
+      <li><a href="/Photos">Photos</a></li>
+    
+      <li> <a href="/atom.xml">RSS</a> </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2014-11-01T07:52:04.000Z"><a href="/2014/11/01/mongodb在centos上的安装/">11月 1 2014</a></time>
+      
+      
+  
+    <h1 class="title">mongodb在centos上的安装</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>mongodb的安装方式有很多种，我这里来依次介绍其安装方法</p>
+<h3 id="rpm包安装">rpm包安装</h3>
+<h4 id="添加yum源地址(使用mongo官方的源)">添加yum源地址(使用mongo官方的源)</h4>
+<p><a id="more"></a></p>
+<h5 id="64位的源">64位的源</h5>
+<p><strong>vim /etc/yum.repo.d/mongo.repo</strong></p>
+<pre><code><span class="title">[mongodb]</span>
+<span class="setting">name=<span class="value">MongoDB Repository</span></span>
+<span class="setting">baseurl=<span class="value">http://downloads-distro.mongodb.org/repo/redhat/os/x86_64/</span></span>
+<span class="setting">gpgcheck=<span class="value"><span class="number">0</span></span></span>
+<span class="setting">enabled=<span class="value"><span class="number">1</span></span></span>
+</code></pre><h5 id="32位的源">32位的源</h5>
+<p><strong>vim /etc/yum.repo.d/mongo.repo</strong></p>
+<pre><code><span class="title">[mongodb]</span>
+<span class="setting">name=<span class="value">MongoDB Repository</span></span>
+<span class="setting">baseurl=<span class="value">http://downloads-distro.mongodb.org/repo/redhat/os/i686/</span></span>
+<span class="setting">gpgcheck=<span class="value"><span class="number">0</span></span></span>
+<span class="setting">enabled=<span class="value"><span class="number">1</span></span></span>
+</code></pre><h4 id="使用yum进行安装">使用yum进行安装</h4>
+<pre><code>yum <span class="operator"><span class="keyword">install</span> mongodb-org -y</span>
+</code></pre><blockquote>
+<p>默认安装的是最新版本，你也可以安装指定的版本，使用如下命令进行</p>
+</blockquote>
+<pre><code>yum <span class="operator"><span class="keyword">install</span> -y mongodb-org-<span class="number">2.6</span><span class="number">.1</span> mongodb-org-<span class="keyword">server</span>-<span class="number">2.6</span><span class="number">.1</span> mongodb-org-shell-<span class="number">2.6</span><span class="number">.1</span> mongodb-org-mongos-<span class="number">2.6</span><span class="number">.1</span> mongodb-org-tools-<span class="number">2.6</span><span class="number">.1</span></span>
+</code></pre><h3 id="二进制包安装">二进制包安装</h3>
+<h4 id="下载源码包">下载源码包</h4>
+<pre><code>wget <span class="symbol">http:</span>/<span class="regexp">/www.mongodb.org/dr</span><span class="regexp">//fastdl</span>.mongodb.org/linux/mongodb-linux-x86_64-<span class="number">2.6</span>.<span class="number">5</span>.tgz/download
+</code></pre><h4 id="解压">解压</h4>
+<pre><code><span class="title">tar</span> xf mongodb-linux-x86_64-<span class="number">2</span>.<span class="number">6</span>.<span class="number">5</span>.tgz
+</code></pre><h4 id="查看文件">查看文件</h4>
+<pre><code>[root<span class="variable">@haodou96</span>.hd.com /home/yangcan/mongodb-linux-x86_64-<span class="number">2.6</span>.<span class="number">5</span>]<span class="comment">#69# 17:14:32</span>
+ls
+bin  <span class="constant">GNU</span>-<span class="constant">AGPL</span>-<span class="number">3.0</span>  <span class="constant">README</span>  <span class="constant">THIRD</span>-<span class="constant">PARTY</span>-<span class="constant">NOTICES</span>
+[root<span class="variable">@haodou96</span>.hd.com /home/yangcan/mongodb-linux-x86_64-<span class="number">2.6</span>.<span class="number">5</span>]<span class="comment">#70# 17:14:33</span>
+cd bin/
+[root<span class="variable">@haodou96</span>.hd.com /home/yangcan/mongodb-linux-x86_64-<span class="number">2.6</span>.<span class="number">5</span>/bin]<span class="comment">#71# 17:14:35</span>
+ ls
+bsondump  mongod     mongoexport  mongoimport  mongoperf     mongos     mongotop
+mongo     mongodump  mongofiles   mongooplog   mongorestore  mongostat
+</code></pre><p>从上面可以看出已经都是二进制包，可以加压后直接拿来使用</p>
+<h4 id="建立相关的文件">建立相关的文件</h4>
+<pre><code>[root<span class="variable">@localhost</span> <span class="keyword">local</span>]<span class="comment"># mv mongodb-linux-x86_64-2.2.2 mongodb</span>
+[root<span class="variable">@localhost</span> <span class="keyword">local</span>]<span class="comment"># chown -R mongodb: mongodb mongodb</span>
+[root<span class="variable">@localhost</span> <span class="keyword">local</span>]<span class="comment"># cd mongodb</span>
+[root<span class="variable">@localhost</span> mongodb]<span class="comment"># mkdir /var/mongodb</span>
+[root<span class="variable">@localhost</span> mongodb]<span class="comment"># mkdir /var/mongodb/data</span>
+[root<span class="variable">@localhost</span> mongodb]<span class="comment"># mkdir /var/mongodb/logs</span>
+</code></pre><h4 id="启动mongodb">启动mongodb</h4>
+<pre><code><span class="regexp">/usr/</span>local<span class="regexp">/mongodb/</span>bin<span class="regexp">/mongod --dbpath=/</span>var<span class="regexp">/mongodb/</span>data --logpath <span class="regexp">/var/m</span>ongodb<span class="regexp">/logs/</span>log.log -fork
+</code></pre><h3 id="源码安装">源码安装</h3>
+<h4 id="下载安装包">下载安装包</h4>
+<pre><code>wget https://fastdl.mongodb<span class="preprocessor">.org</span>/src/mongodb-src-<span class="built_in">r2</span><span class="number">.6</span><span class="number">.5</span>.tar.gz    
+</code></pre><h4 id="下载并安装编译安装所需的依赖包">下载并安装编译安装所需的依赖包</h4>
+<h5 id="安装python-devel">安装python-devel</h5>
+<pre><code>yum install -<span class="keyword">y</span> <span class="keyword">python</span>-devel  
+</code></pre><h4 id="下载scons并安装scons">下载scons并安装scons</h4>
+<pre><code><span class="title">wget</span> <span class="url">http://prdownloads.sourceforge.net/scons/scons-2.3.3.tar.gz</span>
+tar zxf scons-<span class="number">2</span>.<span class="number">3</span>.<span class="number">3</span>.tar.gz
+cd scons-<span class="number">2</span>.<span class="number">3</span>.<span class="number">3</span>
+python setup.py install
+</code></pre><h4 id="安装spidermonkey库，">安装spidermonkey库，</h4>
+<p>下载支持c的js api库 点此下载<a href="http://ftp.mozilla.org/pub/mozilla.org/js/js-1.7.0.tar.gz" target="_blank" rel="external">http://ftp.mozilla.org/pub/mozilla.org/js/js-1.7.0.tar.gz</a></p>
+<pre><code>yum install -y boost boost-devel
+
+tar zxvf js-<span class="number">1</span>.<span class="number">7</span>.<span class="number">0</span>.tar.gz
+cd js/src/
+<span class="keyword">export</span> <span class="type">CFLAGS</span>=<span class="string">"-DJS_C_STRINGS_ARE_UTF8"</span>
+make -f <span class="type">Makefile</span>.<span class="keyword">ref</span>
+<span class="type">JS_DIST</span>=/usr gmake -f <span class="type">Makefile</span>.<span class="keyword">ref</span> <span class="keyword">export</span>
+</code></pre><h4 id="安装pcre">安装pcre</h4>
+<pre><code>tar zxf pcre-<span class="number">8.12</span>.tar.gz
+<span class="keyword">cd</span> pcre-<span class="number">8.12</span>
+./configure --enable-utf8 --enable-unicode-properties
+<span class="keyword">make</span> &amp;&amp; <span class="keyword">make</span> install
+<span class="keyword">cd</span> ..
+</code></pre><h4 id="安装mongodb">安装mongodb</h4>
+<h5 id="解压文件">解压文件</h5>
+<pre><code>tar xf      mongodb-src-r2.<span class="number">6.5</span>.tar.gz
+<span class="keyword">cd</span> mongodb-src-r2.<span class="number">6.5</span>
+scons <span class="keyword">all</span>   // scons可能出现找不到pcre库的现象(修改/etc/ld.<span class="keyword">so</span>.<span class="keyword">conf</span>也无用,是scons自身的问题)，这时需要打开mongodb-src-r1.<span class="number">8.0</span>下的SConstruct，查找【 linux2<span class="string">"== os.sys.platform:】，在LIBPATH后面添加上pcrecpp库的安装路径，在LIBS后添加上pcrecpp库名，再重新scons all即可(操作：vim SConstruct;原来：env.Append( LIBPATH=["</span>/usr/lib64<span class="string">" , "</span>/lib64<span class="string">" ] ) ；修改后env.Append( LIBPATH=["</span>/usr/lib64<span class="string">" , "</span>/lib64<span class="string">" ,"</span>/usr/local/pcre/lib<span class="string">"]);  接下来在env.Append( LIBS=["</span>pthread<span class="string">"] )后面添加 env.Append( LIBS=["</span>libpcrecpp"] )  )
+</code></pre><h4 id="指定安装位置">指定安装位置</h4>
+<pre><code><span class="attribute">scons --prefix</span>=<span class="string">/usr/local/mongo install    </span>
+</code></pre><h4 id="如果需要安装lib和head，使用如下方式安装">如果需要安装lib和head，使用如下方式安装</h4>
+<pre><code><span class="comment">scons</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">prefix=/usr/local/mongo</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">full</span> <span class="comment">install</span>
+</code></pre><h4 id="创建配置文件">创建配置文件</h4>
+<pre><code>mkdir -p <span class="regexp">/usr/</span>local<span class="regexp">/mongo/</span>etc <span class="regexp">/usr/</span>local<span class="regexp">/mongo/</span>data <span class="regexp">/usr/</span>local<span class="regexp">/mongo/</span>log<span class="regexp">/ /</span>usr<span class="regexp">/local/m</span>ongo<span class="regexp">/repair</span>
+</code></pre><h5 id="在mongo-conf中添加下面的内容">在mongo.conf中添加下面的内容</h5>
+<pre><code><span class="variable">dbpath =</span> /usr/local/mongo/data
+<span class="variable">logpath =</span> /usr/local/mongo/mongodb.log
+<span class="variable">repairpath =</span> /usr/local/mongo/repair
+<span class="variable">pidfilepath =</span> /usr/local/mongo/mongodb.pid
+<span class="variable">directoryperdb =</span> <span class="constant">true</span>
+<span class="variable">logappend =</span> <span class="constant">true</span>
+<span class="variable">noauth =</span> <span class="constant">true</span>
+<span class="variable">port =</span> <span class="number">27017</span>
+<span class="variable">maxConns =</span> <span class="number">1024</span>
+<span class="variable">fork =</span> <span class="constant">true</span>
+<span class="variable">rest =</span> <span class="constant">true</span>
+<span class="variable">quota =</span> <span class="constant">true</span>
+<span class="variable">quotaFiles =</span> <span class="number">1024</span>
+<span class="variable">nssize =</span> <span class="number">16</span>
+</code></pre><h4 id="启动mongodb-1">启动mongodb</h4>
+<pre><code>ln -s <span class="regexp">/usr/</span>local<span class="regexp">/mongo/</span>bin<span class="regexp">/mongod /</span>usr<span class="regexp">/bin/m</span>ongod
+mongod -f <span class="regexp">/usr/</span>local<span class="regexp">/mongo/</span>etc<span class="regexp">/mongo.conf</span>
+</code></pre><p>看看是不是启动起来了，但是使用这种方式管理mongodb服务器很不明智，我们完善一下：</p>
+<pre><code>mkdir -p <span class="regexp">/usr/</span>local<span class="regexp">/mongo/</span>srv
+vim <span class="regexp">/usr/</span>local<span class="regexp">/mongo/</span>srv<span class="regexp">/mongodb-start</span>
+</code></pre><p>添加下面的内容</p>
+<pre><code><span class="shebang">#!/bin/sh</span>
+mongod <span class="operator">-f</span> /usr/local/mongo/etc/mongo.conf
+</code></pre><p>vim /usr/local/mongo/srv/mongodb-stop<br>添加下面的内容</p>
+<pre><code><span class="shebang">#!/bin/bash</span>
+pid=`ps -o pid,command ax | grep mongod | awk <span class="string">'!/awk/ &amp;&amp; !/grep/ {print $1}'</span>`;
+<span class="keyword">if</span> [ <span class="string">"<span class="variable">${pid}</span>"</span> != <span class="string">""</span> ]; <span class="keyword">then</span>
+kill -<span class="number">2</span> <span class="variable">${pid}</span>;
+<span class="keyword">fi</span>
+</code></pre><p>添加执行权限</p>
+<pre><code>chmod <span class="operator">a</span>+x /usr/<span class="built_in">local</span>/mongo/srv/mongodb-start
+chmod <span class="operator">a</span>+x /usr/<span class="built_in">local</span>/mongo/srv/mongodb-stop
+</code></pre><p>vim /etc/rc.d/init.d/mongodb<br>添加下面的内容</p>
+<pre><code><span class="shebang">#! /bin/sh</span>
+<span class="comment">#</span>
+<span class="comment"># mongodb – this script starts and stops the mongodb daemon</span>
+<span class="comment">#</span>
+<span class="comment"># chkconfig: - 85 15</span>
+<span class="comment"># description: MongoDB is a non-relational database storage system.</span>
+<span class="comment"># processname: mongodb</span>
+<span class="comment"># config: /usr/local/mongo/etc/mongo.conf</span>
+<span class="comment"># pidfile: /usr/local/mongo/mongodb.pid</span>
+PATH=/usr/local/mongo/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=mongodb
+test -x <span class="variable">$DAEMON</span> || <span class="keyword">exit</span> <span class="number">0</span>
+<span class="keyword">set</span> <span class="operator">-e</span>
+<span class="keyword">case</span> <span class="string">"<span class="variable">$1</span>"</span> <span class="keyword">in</span>
+start)
+<span class="built_in">echo</span> -n <span class="string">"Starting MongoDB... "</span>
+/usr/local/mongo/srv/mongodb-start
+    ;;
+stop)
+    <span class="built_in">echo</span> -n <span class="string">"Stopping MongoDB... "</span>
+    /usr/local/mongo/srv/mongodb-stop
+    ;;
+  *)
+        N=/etc/init.d/<span class="variable">$NAME</span>
+        <span class="built_in">echo</span> <span class="string">"Usage: <span class="variable">$N</span> {start|stop}"</span> &gt;&amp;<span class="number">2</span>
+        <span class="keyword">exit</span> <span class="number">1</span>
+        ;;
+<span class="keyword">esac</span>
+<span class="keyword">exit</span> <span class="number">0</span>
+</code></pre><p>添加服务</p>
+<pre><code>chmod a+x <span class="regexp">/etc/</span>rc.d<span class="regexp">/init.d/m</span>ongodb
+chkconfig --add mongodb
+chkconfig --level <span class="number">345</span> mongodb on
+<span class="regexp">/etc/</span>rc.d<span class="regexp">/init.d/m</span>ongodb start    
+</code></pre><h4 id="测试">测试</h4>
+<p>终止服务器进程 </p>
+<pre><code>db.<span class="literal">user</span>.shutdownServer()
+</code></pre><p>进入mongodb的shell模式 </p>
+<pre><code><span class="regexp">/usr/</span>local<span class="regexp">/mongodb/</span>bin<span class="regexp">/mongo</span>
+</code></pre><p>查看数据库列表 </p>
+<pre><code><span class="literal">show</span> dbs
+</code></pre><p>切换/创建数据库(当创建一个集合(table)的时候会自动创建当前数据库)</p>
+<pre><code><span class="keyword">use</span> <span class="title">admin</span>;
+</code></pre><p>增加用户 </p>
+<pre><code>db.addUser(<span class="string">"zhoulf "</span>,<span class="string">"123456"</span>,<span class="literal">true</span>)
+</code></pre><p>更改密码（为已经存在的用户更改密码） </p>
+<pre><code><span class="pseudo">db</span>.addUser(<span class="string">"zhoulf "</span>,<span class="string">" zhoulf "</span>)<span class="comment">; </span>
+</code></pre><p>显示当前db状态 </p>
+<pre><code><span class="pseudo">db</span>.stats()<span class="comment">;</span>
+</code></pre><p>当前db版本 </p>
+<pre><code>db.<span class="keyword">version</span>();
+</code></pre><p>删除当前使用数据库 </p>
+<pre><code><span class="pseudo">db</span>.dropDatabase()<span class="comment">;</span>
+</code></pre><p>查看当前db的链接机器地址 </p>
+<pre><code><span class="pseudo">db</span>.getMongo()<span class="comment">;</span>
+</code></pre><p>简单插入数据 </p>
+<pre><code>db.<span class="literal">user</span>.insert({<span class="string">"fname"</span>:<span class="string">"zhoulf"</span>, <span class="string">"company"</span>:<span class="string">"navinfo"</span>})
+</code></pre><p>循环插入数据 </p>
+<pre><code><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">1</span>; i &lt;= <span class="number">10</span>; i++) db.user.save({ <span class="string">"fname"</span> : <span class="string">"zhoulf"</span>+i, <span class="string">"company"</span> : <span class="string">"navinfo"</span>+i });
+</code></pre><p>查询数据 </p>
+<pre><code>db.<span class="literal">user</span>.find()    
+</code></pre>
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/cache/">cache</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/mongo/">mongo</a>
+  </div>
+
+	
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    <a href="/2014/11/01/php使用redis做session/" class="alignleft prev" >上一页</a>
+    
+    
+    <a href="/2014/11/01/php安装mongo的扩展/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<section id="comment">
+<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yangcan"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:www.yangcan.me">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/cache/">cache</a><small>1</small></li>
+  
+    <li><a href="/categories/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/categories/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/categories/mac/">mac</a><small>1</small></li>
+  
+    <li><a href="/categories/php/">php</a><small>2</small></li>
+  
+    <li><a href="/categories/命令/">命令</a><small>2</small></li>
+  
+    <li><a href="/categories/生活/">生活</a><small>1</small></li>
+  
+    <li><a href="/categories/面试题/">面试题</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/cmd/">cmd</a><small>1</small></li>
+  
+    <li><a href="/tags/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/tags/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/mongo/">mongo</a><small>2</small></li>
+  
+    <li><a href="/tags/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/tags/nginx/">nginx</a><small>1</small></li>
+  
+    <li><a href="/tags/php/">php</a><small>3</small></li>
+  
+    <li><a href="/tags/redis/">redis</a><small>1</small></li>
+  
+    <li><a href="/tags/website/">website</a><small>1</small></li>
+  
+    <li><a href="/tags/wget/">wget</a><small>1</small></li>
+  
+    <li><a href="/tags/虚拟机/">虚拟机</a><small>1</small></li>
+  
+    <li><a href="/tags/运维/">运维</a><small>1</small></li>
+  
+    <li><a href="/tags/面试/">面试</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/cmd/" style="font-size: 10.00px;">cmd</a><a href="/tags/docker/" style="font-size: 10.00px;">docker</a><a href="/tags/hexo/" style="font-size: 10.00px;">hexo</a><a href="/tags/mongo/" style="font-size: 15.00px;">mongo</a><a href="/tags/mysql/" style="font-size: 10.00px;">mysql</a><a href="/tags/nginx/" style="font-size: 10.00px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/redis/" style="font-size: 10.00px;">redis</a><a href="/tags/website/" style="font-size: 10.00px;">website</a><a href="/tags/wget/" style="font-size: 10.00px;">wget</a><a href="/tags/虚拟机/" style="font-size: 10.00px;">虚拟机</a><a href="/tags/运维/" style="font-size: 10.00px;">运维</a><a href="/tags/面试/" style="font-size: 10.00px;">面试</a>
+  </div>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=3254648682&verifier=c306487b&dpc=1"></iframe>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+<li><a href="http://zipperary.com/" title="Zippera's Blog">Zippera</a></li>
+</ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2014 snom
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff501752a59d5d204ac71a701b1bd2050' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+</body>
+</html>

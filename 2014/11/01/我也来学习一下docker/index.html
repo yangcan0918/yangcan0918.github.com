@@ -1,0 +1,513 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>我也来学习一下docker | linux运维学习与交流中心</title>
+  <meta name="author" content="snom">
+  
+  <meta name="description" content="本博客主要用来记录linux相关的文章">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="我也来学习一下docker"/>
+  <meta property="og:site_name" content="linux运维学习与交流中心"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+ <link href="/favicon.ico" rel="icon" type="image/x-ico"> 
+  <link rel="alternate" href="/atom.xml" title="linux运维学习与交流中心" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">linux运维学习与交流中心</a></h1>
+  <h2><a href="/">技术永无止境</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">存档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/todolist">ToDo</a></li>
+    
+      <li><a href="/Photos">Photos</a></li>
+    
+      <li> <a href="/atom.xml">RSS</a> </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2014-11-01T08:08:53.000Z"><a href="/2014/11/01/我也来学习一下docker/">11月 1 2014</a></time>
+      
+      
+  
+    <h1 class="title">我也来学习一下docker</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="什么是docker?">什么是docker?</h2>
+<pre><code>docker的英文本意是码头工人，也就是搬运工，这种搬运工搬运的是集装箱（Container），集装箱里面装的可不是商品货物，而是任意类型的App，Docker把App（叫Payload）装在Container内，通过Linux Container技术的包装将App变成一种标准化的、可移植的、自管理的组件，这种组件可以在你的latop上开发、调试、运行，最终非常方便和一致地运行在production环境下。
+</code></pre><a id="more"></a>
+
+<h2 id="docker的核心技术">docker的核心技术</h2>
+<p>Docker的核心底层技术是LXC（Linux Container），Docker在其上面加了薄薄的一层，添加了许多有用的功能。</p>
+<h3 id="docker和LXC的区别">docker和LXC的区别</h3>
+<ul>
+<li>Docker提供了一种可移植的配置标准化机制，允许你一致性地在不同的机器上运行同一个Container；而LXC本身可能因为不同机器的不同配置而无法方便地移植运行；</li>
+<li>Docker以App为中心，为应用的部署做了很多优化，而LXC的帮助脚本主要是聚焦于如何机器启动地更快和耗更少的内存；&gt;* Docker为App提供了一种自动化构建机制（Dockerfile），包括打包，基础设施依赖管理和安装等等；</li>
+<li>Docker提供了一种类似git的Container版本化的机制，允许你对你创建过的容器进行版本管理，依靠这种机制，你还可以下载别人创建的Container，甚至像git那样进行合并；</li>
+<li>Docker Container是可重用的，依赖于版本化机制，你很容易重用别人的Container（叫Image），作为基础版本进行扩展；</li>
+<li>Docker Container是可共享的，有点类似github一样，Docker有自己的INDEX，你可以创建自己的Docker用户并上传和下载Docker Image；</li>
+<li>Docker提供了很多的工具链，形成了一个生态系统；这些工具的目标是自动化、个性化和集成化，包括对PAAS平台的支持等；<h2 id="docker的安装">docker的安装</h2>
+<h3 id="在linux上的安装">在linux上的安装</h3>
+<h4 id="在centos7上安装docker,详见centos">在centos7上安装docker,详见<a href="http://docs.docker.com/installation/centos/" target="_blank" rel="external">centos</a></h4>
+  yum install docker -y<h4 id="在centos6上安装docker">在centos6上安装docker</h4>
+<code>注意:在centos6上，需要使用内核在 2.6.32-431或之后的版本。</code></li>
+</ul>
+<p>在centos6上，docker包在epel包中。</p>
+<h5 id="需要先安装epel源">需要先安装epel源</h5>
+<pre><code><span class="title">wget</span> <span class="url">http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpmsudo</span> rpm -Uvh epel-release-<span class="number">6</span><span class="regexp">*.rpm</span>
+</code></pre><h5 id="使用yum进行安装">使用yum进行安装</h5>
+<pre><code>yum install docker-<span class="built_in">io</span> -y
+</code></pre><h3 id="启动docker">启动docker</h3>
+<pre><code>service docker <span class="operator"><span class="keyword">start</span>
+chkconfig docker <span class="keyword">on</span></span>
+</code></pre><h3 id="在mac上安装">在mac上安装</h3>
+<p>由于LXC本身不支持Mac内核，因此需要跑一个VirtualBox虚拟机（TinyCoreLinux）来安装，幸好Docker社区提供了一个非常方便的工具boot2docker（其实就是一个VBoxManage的包装shell脚本），用于安装Mac下的整个Docker环境。</p>
+<p>具体安装详见<a href="http://docs.docker.com/installation/mac/" target="_blank" rel="external">Installing Docker on Mac OS X</a></p>
+<p>安装完成后，具体情况如下：</p>
+<ul>
+<li>在Mac的home目录~/.boot2docker下创建了虚拟机所需要的文件，其中boot2docker.iso是虚拟机映像，这是一个由CD-ROM引导的TinyCoreLinux系统；而boot2docker-vm.vmdk文件则是你的虚拟机磁盘，你所有的持久化数据都存放在这里，包括docker创建的lxc容器等文件。</li>
+<li>在Mac下，docker被分为客户端docker-client和服务端docker-daemon两部分，如果是在linux（比如ubuntu），实际上则是同一个可执行文件同时充当客户端和服务端。docker-daemon可以监听unix scoket，也可以在tcp socket（默认端口为4234），docker-client会通过一个叫DOCKER_HOST的环境变量读取服务地址和端口，因此你应该在你的bash_profile文件里面添加这么一行：export DOCKER_HOST=tcp://127.0.0.1:4243</li>
+</ul>
+<p>docker-daemon跑在虚拟机上，这个程序实际上就是接收docker-client发送过来的消息命令，创建、启动和销毁lxc容器，以及docker本身的版本管理、映像存储等等 运行你的第一个docker容器 安装完成后，就差不多可以开始创建和运行docker容器了，在这之前，你首先得下载一个Image，什么是Image？我们先来了解docker的2个基础概念：Image和Container。<br>Docker使用了一种叫AUFS的文件系统，这种文件系统可以让你一层一层地叠加修改你的文件，最底下的文件系统是只读的，如果需要修改文件，AUFS会增加一个可写的层（Layer），这样有很多好处，例如不同的Container可以共享底层的只读文件系统（同一个Kernel），使得你可以跑N多个Container而不至于你的硬盘被挤爆了！这个只读的层就是Image！而如你所看到的，一个可写的层就是Container。</p>
+<h4 id="那Image和Container的区别是什么？">那Image和Container的区别是什么？</h4>
+<p>很简单，他们的区别仅仅是一个是只读的层，一个是可写的层，你可以使用docker commit 命令，将你的Container变成一个Image，也就是提交你所运行的Container的修改内容，变成一个新的只读的Image，这非常类似于git commit命令，感觉真棒！</p>
+<h2 id="从源上拉取centos镜像">从源上拉取centos镜像</h2>
+<pre><code><span class="title">docker</span> pull centos
+</code></pre><p>上面将拉取所以的centos镜像，可以在后面加上tag,如下所有centos5,centos6等等，拉取格式为：</p>
+<pre><code>docker pull cento<span class="variable">s:tag</span>
+</code></pre><h2 id="查看运行的镜像">查看运行的镜像</h2>
+<pre><code>docker images centos
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL <span class="keyword">SIZE</span>
+centos              centos5             <span class="number">504</span>a65221a38        <span class="number">10</span> days ago         <span class="number">467.1</span> MB
+centos              centos6             <span class="number">68</span>edf809afe7        <span class="number">10</span> days ago         <span class="number">212.7</span> MB
+centos              centos7             <span class="number">87</span>e5b6b3ccc1        <span class="number">10</span> days ago         <span class="number">224</span> MB
+centos              latest              <span class="number">87</span>e5b6b3ccc1        <span class="number">10</span> days ago         <span class="number">224</span> MB
+</code></pre><h2 id="运行bash测试镜像">运行bash测试镜像</h2>
+<pre><code>docker run -i -t centos <span class="regexp">/bin/</span>bash
+</code></pre><p>在这里可以给container命一个名字，通过—name选项进行命名，之后就可以直接用这个名字引用container了</p>
+<pre><code>docker <span class="command">run</span> -i -t <span class="comment">--name centos6 cnetos:centos6 /bin/bash</span>
+</code></pre><h2 id="run_a_daemon_on_container">run a daemon on container</h2>
+<h3 id="运行一个daemon的container">运行一个daemon的container</h3>
+<pre><code>docker run <span class="operator">-d</span> ubuntu:<span class="number">14.04</span> /bin/sh -c <span class="string">"while true; do echo hello world; sleep 1; done"</span>
+</code></pre><p>运行时会生成一个id号：<code>5d959cefffec4d0ccc47430d81160cc9d622d5a900274da9cab68e940d88d488</code></p>
+<h3 id="根据容器的id号可以查看运行状况">根据容器的id号可以查看运行状况</h3>
+<h4 id="docker_ps">docker ps</h4>
+<pre><code><span class="type">CONTAINER</span> <span class="type">ID</span>        <span class="type">IMAGE</span>               <span class="type">COMMAND</span>                <span class="type">CREATED</span>             <span class="type">STATUS</span>              <span class="type">PORTS</span>               <span class="type">NAMES</span>
+5d959cefffec        ubuntu:<span class="number">14.04</span>        /bin/sh -<span class="built_in">c</span> '<span class="keyword">while</span> tr   <span class="number">3</span> minutes ago       <span class="type">Up</span> <span class="number">3</span> minutes                            goofy_leakeyy
+</code></pre><p>由于没有进行命名，所以会自动生成一个名字，这里生成的名字是 goofy_leakeyy，也可以使用—name进行命名。</p>
+<h3 id="查看运行结果">查看运行结果</h3>
+<pre><code><span class="title">docker</span> logs goofy_leakeyy
+</code></pre><h3 id="停止运行container">停止运行container</h3>
+<pre><code>docker <span class="keyword">stop</span> goofy_leakey
+</code></pre><h2 id="两个概念：镜像和容器">两个概念：镜像和容器</h2>
+<h4 id="镜像_指上面的centos:centos6这种">镜像 指上面的centos:centos6这种</h4>
+<h4 id="容器_是在具体的_镜像_上_run_具体的命令,_得到的一个”绑定状态”-_run_命令执行时的一些参数(比如和实体机的端口映射),_也是”状态”的一部分,_run_过之后就不能更改了-">容器 是在具体的 镜像 上 run 具体的命令, 得到的一个”绑定状态”. run 命令执行时的一些参数(比如和实体机的端口映射), 也是”状态”的一部分, run 过之后就不能更改了.</h4>
+<p>它们的关系, 有些像编程语言中的 类 和 实例 . run 时的命令就像是类实例化时的参数. 后面会提到, 你可以删除 容器 , 也可以删除 镜像 . 当你想删除 镜像 , 但是使用它的 容器 还存在时, 你会得到操作失败的提示.<br>类 有继承关系, 得利于 AUFS 这些的层级文件系统, 镜像 的构建也是这种层层封装的结果.</p>
+<h2 id="基本命令">基本命令</h2>
+<ul>
+<li>docker images  显示镜像列表</li>
+<li>docker ps 显示容器列表</li>
+<li>docker run IMAGE_ID 指定镜像, 运行一个容器</li>
+<li>docker start/stop/pause/unpause/kill/restart CONTAINER_ID 操作容器状态</li>
+<li>docker tag IMAGE_ID [REGISTRYHOST/][USERNAME/]NAME[:TAG] 给指定镜像命名</li>
+<li>docker pull/push NAME:TAG 下载, 推送镜像到 Docker registry server , NAME 部分包括了服务地址* docker rm/rmi CONTAINER_ID/IMAGE_ID 删除容器, 镜像</li>
+<li>docker inspect CONTAINER_ID/IMAGE_ID 查看细节信息</li>
+<li>docker top CONTAINER_ID 查看指定的运行容器的进程情况</li>
+<li>docker info 查看系统配置信息</li>
+<li>docker save/load 保存, 恢复镜像信息</li>
+<li>docker commit CONTAINER_ID 从容器创建镜像</li>
+<li>docker export &gt; xxx.tar 保存一个容器</li>
+<li>docker import - &lt; xxx.tar 恢复一个容器</li>
+<li>docker cp CONTAINER_ID:PATH HOSTPATH 从镜像复制文件到实体机</li>
+<li>docker diff CONTAINER_ID 查看容器相对于镜像的文件变化</li>
+<li>docker logs CONTAINER_ID 查看容器日志</li>
+<li>docker build 从 Dockerfile 构建镜像</li>
+<li>docker history IMAGE_ID 查看镜像的构建历史</li>
+</ul>
+<h2 id="Dockerfile">Dockerfile</h2>
+<p>Dockerfile 是记录了镜像是如何被构建出来的配置文件, 可以被 docker 直接执行以创建一个镜像. 它的样子:</p>
+<pre><code>FROM ubuntu:<span class="number">14.04</span>
+MAINTAINER YS.Zou &lt;&gt;
+
+<span class="keyword">ADD</span> run /root/run
+<span class="keyword">ADD</span> sources<span class="preprocessor">.list</span> /etc/apt/sources<span class="preprocessor">.list</span>
+<span class="keyword">ADD</span> id_rsa.pub /tmp/pubkey
+<span class="keyword">ADD</span> requirements /root/requirements
+
+RUN mkdir -p /root/.ssh &amp;&amp; \
+cat /tmp/pubkey &gt;&gt; /root/.ssh/authorized_keys &amp;&amp; \
+rm -rf /tmp/pubkey
+CMD [<span class="string">"bash"</span>, <span class="string">"/root/run"</span>]
+</code></pre><p>把文件命名为 Dockerfile , 进入文件所在目录, 输入:</p>
+<pre><code>docker build .
+</code></pre><p>就可以开始构建过程, 并且得到一个新的镜像了.</p>
+<h3 id="Dockerfile支持一些很简单的命令">Dockerfile支持一些很简单的命令</h3>
+<ul>
+<li>FROM 以哪个镜像为基础开始构建.</li>
+<li>MAINTAINER 作者信息.</li>
+<li>RUN 运行一条命令</li>
+<li>CMD docker run IMAGE_ID cmd 这里的默认命令</li>
+<li>ENTRYPOINT  docker run IMAGE_ID cmd 这里的默认命令的前面部分, run 中 cmd 可以作为后续参数.</li>
+<li>EXPOSE 声明会用到的端口.</li>
+<li>ENV 设置环境变量</li>
+<li>ADD 从当前目录复制文件到容器. 会自动处理目录, 压缩包等情况.</li>
+<li>COPY 从当前目录复制文件到容器. 只是单纯地复制文件.</li>
+<li>VOLUME 声明一个数据卷, 可用于挂载.</li>
+<li>USER RUN 命令执行时的用户.</li>
+<li>WORKDIR RUN, CMD, ENTRYPOINT 这些命令执行时的当前目录.</li>
+<li>ONBUILD 前缀命令, 放在上面这些命令前面, 表示生成的镜像再次作为”基础镜像”被用于构建时, 要执行的命令.</li>
+</ul>
+<p>build 的过程, 会依次执行上面的命令, 实际上, docker 做的事, 也就是从基础镜像启一个容器, 然后执行一条命令, 修改之后提交此容器为新镜像. 以此类推, 直到所有命令都执行完. 所以在得到最终构建的镜像时, 会生成很多”中间镜像”. 而如果 Dockerfile 中某条命令有错, 也是在当前中止, 过程中的”中间镜像”及”当前构建用的容器”仍然存在的.</p>
+<h2 id="分区挂载和数据卷">分区挂载和数据卷</h2>
+<p>容器中的文件系统是独立的, 一旦容器被删除, 则文件系统也会被删除. 如果想容器和实体机在文件系统层面打通, 可以把指定目录挂载到容器当中:</p>
+<pre><code>docker run -d -p <span class="number">5000</span>:<span class="number">22</span> -v <span class="regexp">/home/</span>zys<span class="regexp">/temp:/</span>root<span class="regexp">/volumn zys:common</span>
+</code></pre><p>使用 -v 参数, 就可以把多个实体机目录挂载到容器的文件系统中.</p>
+<p>上面是直观的目录挂载. docker 还有自己的一个 数据卷 的概念. 它可以在容器中定义一些目录, 这些目录不使用层级的 AUFS 文件系统, 并且这些目录独立于容器而存在:</p>
+<pre><code>docker run -d -p <span class="number">5000</span>:<span class="number">22</span> -v /root/a --name=<span class="keyword">test</span> zys:<span class="built_in">common</span>
+</code></pre><p>这样, 其 /root/a 目录就是一个数据卷, 如果使用 docker inspect 查看容器, 可以看到类似下面的信息:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="string">"Volumes"</span>: {</div><div class="line">    <span class="string">"/root/a"</span>: <span class="string">"/var/lib/docker/vfs/dir/xxx"</span></div><div class="line">},</div><div class="line"><span class="string">"VolumesRW"</span>: {</div><div class="line">    <span class="string">"/root/a"</span>: <span class="literal">true</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>其它的容器可以重用这个数据卷:<br>    docker run -d -p 5000:22 —volumes-from=test zys:common<br>这里的形式有些别扭啊, 数据卷本来是独立于容器, 但是要想重用它, 又必须基于容器的名字.<br>当所有容器被删除后, 数据卷本身是还存在的, 但是这时好像没办法再去直接使用它了, 不过里面的数据你可以想办法弄到容器里去再作下一步处理.</p>
+<h2 id="镜像服务器">镜像服务器</h2>
+<p>docker 的镜像服务器 docker-registry 是 docker 项目的组成部分. 前面在谈 docker 的命令时, 它的 pull/push 命令就是和镜像服务器打交道. 并且, docker 的设计之中, 服务器地址不是单独配置的, 而是作为镜像名称的一部分.</p>
+<h3 id="镜像的完整名称是:">镜像的完整名称是:</h3>
+<pre><code><span class="number">127.0</span><span class="string">.0</span><span class="string">.1</span>:<span class="number">5000</span>/zephyr/<span class="built_in">common</span>:latest
+</code></pre><h3 id="各部分的意思:">各部分的意思:</h3>
+<ul>
+<li>127.0.0.1:5000 就是服务器地址</li>
+<li>zephyr 是名字空间</li>
+<li>common 是镜像名</li>
+<li>latest 是版本</li>
+</ul>
+<p>docker-registry 的实现也是开源的, 在 github <a href="https://github.com/dotcloud/docker-registry" target="_blank" rel="external">https://github.com/dotcloud/docker-registry</a>上拿下源码就可以跑起来.<br>拿下源码之后, 项目中有一个 Dockerfile 文件, 我们可以开始构建镜像了. build 之前, 因为 GFW 的原因, 我们可以先把 Dockerfile 调整一下, 包括两部分:</p>
+<ul>
+<li>把 ubuntu 的软件源改成国内的.</li>
+<li>把 pip 的源改成国内的.</li>
+</ul>
+<p>然后开始构建</p>
+<pre><code>docker build --rm -t registry .
+</code></pre><p>完成之后, 你可以得到一个名为 registry 的镜像, 直接运行即可:</p>
+<pre><code><span class="tag">docker</span> <span class="tag">run</span> <span class="tag">-p</span> 5000<span class="pseudo">:5000</span> <span class="tag">registry</span>
+</code></pre><p>访问 <code>http://localhost:5000</code> 能得到响应, 一个 <code>docker-registry</code> 服务就起来了.<br>现在你可以把镜像提交到上面去:</p>
+<pre><code>docker tag xxx <span class="number">127.0</span><span class="string">.0</span><span class="string">.1</span>:<span class="number">5000</span>/zephyr/<span class="built_in">common</span>
+docker <span class="keyword">push</span> <span class="number">127.0</span><span class="string">.0</span><span class="string">.1</span>:<span class="number">5000</span>/zephyr/<span class="built_in">common</span>
+</code></pre><p>完成之后, 在浏览器中访问 <code>http://localhost:5000/v1/search</code> 可以看到列表.</p>
+<h4 id="获取镜像:">获取镜像:</h4>
+<pre><code><span class="title">docker</span> pull <span class="number">127.0.0.1:5000</span>/zephyr/common
+</code></pre><p>docker-registry 本身是设计成一套 Web API 的, 具体文档在 <a href="http://docs.docker.com/reference/api/registry_api/" target="_blank" rel="external">http://docs.docker.com/reference/api/registry_api/</a></p>
+<p>docker本身的服务, 也是有一套基于网络的 API 可供使用的, 文档在<a href="http://docs.docker.com/reference/api/docker_remote_api/" target="_blank" rel="external">http://docs.docker.com/reference/api/docker_remote_api/</a></p>
+<h2 id="从Docker_Hub源上下载image和制作image,上传image">从Docker Hub源上下载image和制作image,上传image</h2>
+<h3 id="从Docker_Hub源上下载image">从Docker Hub源上下载image</h3>
+<pre><code><span class="title">docker</span> pull centos
+</code></pre><p>可以在<a href="https://registry.hub.docker.com/" target="_blank" rel="external">https://registry.hub.docker.com/</a>搜素image，也可以使用命令行，输入关键字进行搜索,如需要搜索包含sinatra,则使用<code>docker search sinatra</code>进行搜索</p>
+<h4 id="通过搜索发现了training/sinatra,进行download">通过搜索发现了<code>training/sinatra</code>,进行download</h4>
+<pre><code><span class="title">docker</span> pull training/sinatra
+</code></pre><h4 id="run_image">run image</h4>
+<pre><code>docker run -t -i training<span class="regexp">/sinatra /</span>bin<span class="regexp">/bash</span>
+</code></pre><h3 id="创建一个自己的images">创建一个自己的images</h3>
+<h4 id="创建方式">创建方式</h4>
+<ul>
+<li>We can update a container created from an image and commit the results to an image.更新一个已经存在的镜像，然后进行提交</li>
+<li>We can use a Dockerfile to specify instructions to create an image. 使用Dokerfile文件进行创建镜像</li>
+</ul>
+<h5 id="方式一">方式一</h5>
+<h6 id="运行容器，生成一个container_ID_0b2616b0e5a8">运行容器，生成一个container ID 0b2616b0e5a8</h6>
+<pre><code>sudo docker run -t -i training/sinatra /bin/bash
+root<span class="variable">@0b2616b0e5a8</span><span class="symbol">:/</span><span class="comment">#</span>
+</code></pre><h5 id="添加json">添加json</h5>
+<pre><code>root<span class="variable">@0b2616b0e5a8</span><span class="symbol">:/</span><span class="comment"># gem install json</span>
+</code></pre><h5 id="退出容器container">退出容器container</h5>
+<pre><code><span class="keyword">exit</span>
+</code></pre><h5 id="进行提交">进行提交</h5>
+<pre><code>docker commit <span class="variable">-m=</span><span class="string">"Added json gem"</span> <span class="variable">-a=</span><span class="string">"Kate Smith"</span> <span class="number">0</span>b2616b0e5a8 ouruser/sinatra:v2
+</code></pre><p><code>-m 表示提交信息   -a  指定作者</code></p>
+<h5 id="方式二">方式二</h5>
+<p>Using the docker commit command is a pretty simple way of extending an image but it’s a bit cumbersome and it’s not easy to share a development process for images amongst a team. Instead we can use a new command, docker build, to build new images from scratch.To do this we create a Dockerfile that contains a set of instructions that tell Docker how to build our image.</p>
+<h6 id="创建一个directory_and_a_Dockerfile">创建一个directory and a Dockerfile</h6>
+<pre><code><span class="built_in">mkdir</span> sinatra
+<span class="keyword">cd</span> sinatra
+touch Dockerfile
+</code></pre><h6 id="Dockerfile-1">Dockerfile</h6>
+<pre><code><span class="preprocessor"># This is a comment</span>
+FROM ubuntu:<span class="number">14.04</span>
+MAINTAINER Kate Smith &lt;ksmith@example.com&gt;
+RUN apt-<span class="keyword">get</span> update &amp;&amp; apt-<span class="keyword">get</span> install -y ruby ruby-dev
+RUN gem install sinatra
+</code></pre><h6 id="使用docker_build创建一个新的image">使用docker build创建一个新的image</h6>
+<pre><code>docker build -t=<span class="string">"ouruser/sinatra:v2"</span> .
+</code></pre><p>We’ve specified our docker build command and used the -t flag to identify our new image as belonging to the user ouruser, the repository name sinatra and given it the tag v2.<br>We’ve also specified the location of our Dockerfile using the . to indicate a Dockerfile in the current directory.</p>
+<h6 id="push_an_image_to_docker_hub">push an image to docker hub</h6>
+<pre><code>    docker <span class="keyword">push</span> ouruser/sinatra
+</code></pre><h6 id="remove_an_image_from_the_hosts">remove an image from the hosts</h6>
+<pre><code><span class="title">docker</span> rmi training/sinatra
+</code></pre><h2 id="网络">网络</h2>
+<pre><code>docker 安装后, 会自动在系统做一个网桥配置 docker0 . 其容器都会分配到此网桥配置下的独立, 私有 <span class="variable">IP</span> 地址.
+</code></pre><p>如果你要自己配置桥接, 也可以把 docker0 删除掉. docker run 的时候使用参数 -b 指定你自己配置的网桥.<br>docker 容器的网络, 是相对于实体机的私有网络. 在网桥配置下, 只要知道 IP 地址, 各容器, 及实体机本身都可以自由通信.但是在实体机的网卡网络下, docker 容器就不可见了. 要让容器被外界访问到, 最简单的一个方法就是直接做端口映射, 把容器的端口和实体机端口成对连通. docker run 的时候使用 -p 参数就可以指定一对端口映射:</p>
+<h3 id="网卡端口映射">网卡端口映射</h3>
+<pre><code><span class="built_in">sudo</span> docker run <span class="operator">-d</span> -P training/webapp python app.py
+</code></pre><p>使用-P选项将会随机映射一个网络端口，端口范围在49000~49900,可以使用docker ps 进行查看</p>
+<pre><code><span class="title">docker</span> run -d -p <span class="number">127.0.0.1:5000</span>:<span class="number">5000</span> training/webapp python app.py
+</code></pre><p>绑定一个Ip地址</p>
+<pre><code><span class="title">docker</span> run -d -p <span class="number">127.0.0.1</span>::<span class="number">5000</span> training/webapp python app.py
+</code></pre><p>to bind port 5000 of the container to a dynamic port but only on the localhost</p>
+<pre><code><span class="title">docker</span> run -d -p <span class="number">127.0.0.1:5000</span>:<span class="number">5000</span>/udp training/webapp python app.py
+</code></pre><p>You can also bind UDP ports by adding a trailing /udp</p>
+<h3 id="实例">实例</h3>
+<pre><code><span class="tag">docker</span> <span class="tag">run</span> <span class="tag">-d</span> <span class="tag">-p</span> 5000<span class="pseudo">:22</span> <span class="tag">-p</span> 18888<span class="pseudo">:8888</span> <span class="tag">zys</span><span class="pseudo">:common</span>
+</code></pre><p>上面的命令, 在启动容器时, 指定的端口映射表示实体机 5000 端口映射到容器 22 端口, 同时 18888 端口映射到容器 8888 端口. 这样做之后, 就可以通过实体机的 5000 端口 ssh 登录到容器了:</p>
+<pre><code><span class="title">ssh</span> root<span class="variable">@localhost</span> -p5000
+ssh root<span class="variable">@realip</span> -p5000
+</code></pre><h4 id="docker_run_时还有其它参数可用到控制容器得网络配置">docker run 时还有其它参数可用到控制容器得网络配置</h4>
+<pre><code>-<span class="ruby">p 端口映射
+</span>-<span class="ruby">h 设置主机名, 这个主机名是仅容器自己可见的.
+</span>-<span class="ruby">-link=<span class="constant">CONTAINER_NAME</span><span class="symbol">:ALIAS</span>
+</span>把另一个容器的地址配置成一个ALIAS 主机名.
+-<span class="ruby">-dns 配置<span class="constant">DNS</span>服务器.</span>
+</code></pre><h2 id="容器命名">容器命名</h2>
+<h4 id="将容器命名为web">将容器命名为web</h4>
+<pre><code>    docker run -<span class="keyword">d</span> -<span class="keyword">P</span> --name web training/webapp <span class="keyword">python</span> app.<span class="keyword">py</span>
+</code></pre><h4 id="查看容器的名字">查看容器的名字</h4>
+<pre><code>    docker inspect <span class="operator">-f</span> <span class="string">""</span> aed84ee21bde(CONTAINER ID)
+</code></pre><h4 id="删除web容器">删除web容器</h4>
+<pre><code>docker rm <span class="operator">-f</span> web
+</code></pre><h4 id="create_a_new_web_container_and_link_it_with_your_db_container-">create a new web container and link it with your db container.</h4>
+<pre><code>docker run -<span class="keyword">d</span> -<span class="keyword">P</span> --name web --link <span class="keyword">d</span><span class="variable">b:db</span> training/webapp <span class="keyword">python</span> app.<span class="keyword">py</span>
+</code></pre><h2 id="在容器中管理数据">在容器中管理数据</h2>
+<h3 id="添加一个数据卷">添加一个数据卷</h3>
+<pre><code>docker run -<span class="keyword">d</span> -<span class="keyword">P</span> --name web -<span class="keyword">v</span> /webapp training/webapp <span class="keyword">python</span> app.<span class="keyword">py</span>
+</code></pre><p><code>-v /webapp 表示挂载/webapp目录,You can also use the VOLUME instruction in a Dockerfile to add one or more new volumes to any container created from that image.</code></p>
+<h3 id="挂载一个主机目录作为数据卷">挂载一个主机目录作为数据卷</h3>
+<pre><code>docker run -d -P --name web -v <span class="regexp">/src/</span>webapp:<span class="regexp">/opt/</span>webapp training<span class="regexp">/webapp python app.py</span>
+</code></pre><p>This will mount the local directory, /src/webapp, into the container as the /opt/webapp directory.</p>
+<h3 id="挂载只读">挂载只读</h3>
+<p>默认挂载是可以读写的，在这里挂载只读</p>
+<pre><code>docker run -d -P --name web -v <span class="regexp">/src/</span>webapp:<span class="regexp">/opt/</span>webapp:ro training<span class="regexp">/webapp python app.py</span>
+</code></pre><h3 id="挂载文件">挂载文件</h3>
+<pre><code>docker run --rm -it -v ~<span class="regexp">/.bash_history:/</span>.bash_history ubuntu <span class="regexp">/bin/</span>bash
+</code></pre><h3 id="创建并挂载一个数据卷容器">创建并挂载一个数据卷容器</h3>
+<pre><code>docker run <span class="operator">-d</span> -v /dbdata --name dbdata training/postgres <span class="built_in">echo</span> Data-only container <span class="keyword">for</span> postgres
+</code></pre><h4 id="You_can_then_use_the_—volumes-from_flag_to_mount_the_/dbdata_volume_in_another_container-">You can then use the —volumes-from flag to mount the /dbdata volume in another container.</h4>
+<pre><code><span class="comment">docker</span> <span class="comment">run</span> <span class="literal">-</span><span class="comment">d</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">volumes</span><span class="literal">-</span><span class="comment">from</span> <span class="comment">dbdata</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">name</span> <span class="comment">db1</span> <span class="comment">training/postgres</span>
+<span class="comment">docker</span> <span class="comment">run</span> <span class="literal">-</span><span class="comment">d</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">volumes</span><span class="literal">-</span><span class="comment">from</span> <span class="comment">dbdata</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">name</span> <span class="comment">db2</span> <span class="comment">training/postgres</span>
+</code></pre><h4 id="Backup,_restore,_or_migrate_data_volumes">Backup, restore, or migrate data volumes</h4>
+<pre><code>docker run --volumes-from dbdata -v <span class="variable">$(</span>pwd)<span class="symbol">:/backup</span> ubuntu tar cvf /backup/backup.tar /dbdata    docker run -v /dbdata --name dbdata2 ubuntu /bin/bash
+docker run --volumes-from dbdata2 -v <span class="variable">$(</span>pwd)<span class="symbol">:/backup</span> busybox tar xvf /backup/backup.tar
+</code></pre><h3 id="参考文档">参考文档</h3>
+<p><a href="http://www.zouyesheng.com/docker.html" target="_blank" rel="external">http://www.zouyesheng.com/docker.html</a><br><a href="http://cn.soulmachine.me/blog/20131026/" target="_blank" rel="external">http://cn.soulmachine.me/blog/20131026/</a><br><a href="http://tech.uc.cn/?p=2726" target="_blank" rel="external">http://tech.uc.cn/?p=2726</a><br><a href="https://docker.cn/p/deploy-your-own-private-docker-registry/" target="_blank" rel="external">https://docker.cn/p/deploy-your-own-private-docker-registry/</a></p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/docker/">docker</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/docker/">docker</a>, <a href="/tags/虚拟机/">虚拟机</a>
+  </div>
+
+	
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    <a href="/2014/11/01/hexo博客系统/" class="alignleft prev" >上一页</a>
+    
+    
+    <a href="/2014/11/01/wget命令的使用/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<section id="comment">
+<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yangcan"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:www.yangcan.me">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/cache/">cache</a><small>1</small></li>
+  
+    <li><a href="/categories/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/categories/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/categories/mac/">mac</a><small>1</small></li>
+  
+    <li><a href="/categories/php/">php</a><small>2</small></li>
+  
+    <li><a href="/categories/命令/">命令</a><small>2</small></li>
+  
+    <li><a href="/categories/生活/">生活</a><small>1</small></li>
+  
+    <li><a href="/categories/面试题/">面试题</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/cmd/">cmd</a><small>1</small></li>
+  
+    <li><a href="/tags/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/tags/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/mongo/">mongo</a><small>2</small></li>
+  
+    <li><a href="/tags/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/tags/nginx/">nginx</a><small>1</small></li>
+  
+    <li><a href="/tags/php/">php</a><small>3</small></li>
+  
+    <li><a href="/tags/redis/">redis</a><small>1</small></li>
+  
+    <li><a href="/tags/website/">website</a><small>1</small></li>
+  
+    <li><a href="/tags/wget/">wget</a><small>1</small></li>
+  
+    <li><a href="/tags/虚拟机/">虚拟机</a><small>1</small></li>
+  
+    <li><a href="/tags/运维/">运维</a><small>1</small></li>
+  
+    <li><a href="/tags/面试/">面试</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/cmd/" style="font-size: 10.00px;">cmd</a><a href="/tags/docker/" style="font-size: 10.00px;">docker</a><a href="/tags/hexo/" style="font-size: 10.00px;">hexo</a><a href="/tags/mongo/" style="font-size: 15.00px;">mongo</a><a href="/tags/mysql/" style="font-size: 10.00px;">mysql</a><a href="/tags/nginx/" style="font-size: 10.00px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/redis/" style="font-size: 10.00px;">redis</a><a href="/tags/website/" style="font-size: 10.00px;">website</a><a href="/tags/wget/" style="font-size: 10.00px;">wget</a><a href="/tags/虚拟机/" style="font-size: 10.00px;">虚拟机</a><a href="/tags/运维/" style="font-size: 10.00px;">运维</a><a href="/tags/面试/" style="font-size: 10.00px;">面试</a>
+  </div>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=3254648682&verifier=c306487b&dpc=1"></iframe>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+<li><a href="http://zipperary.com/" title="Zippera's Blog">Zippera</a></li>
+</ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2014 snom
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff501752a59d5d204ac71a701b1bd2050' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+</body>
+</html>
