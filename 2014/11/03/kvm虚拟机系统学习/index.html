@@ -1,0 +1,688 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>kvm虚拟机系统学习 | linux运维学习与交流中心</title>
+  <meta name="author" content="snom">
+  
+  <meta name="description" content="本博客主要用来记录linux相关的文章">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="kvm虚拟机系统学习"/>
+  <meta property="og:site_name" content="linux运维学习与交流中心"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+ <link href="/favicon.ico" rel="icon" type="image/x-ico"> 
+  <link rel="alternate" href="/atom.xml" title="linux运维学习与交流中心" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">linux运维学习与交流中心</a></h1>
+  <h2><a href="/">技术永无止境</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">存档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/todolist">ToDo</a></li>
+    
+      <li><a href="/Photos">Photos</a></li>
+    
+      <li> <a href="/atom.xml">RSS</a> </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2014-11-03T13:41:50.000Z"><a href="/2014/11/03/kvm虚拟机系统学习/">11月 3 2014</a></time>
+      
+      
+  
+    <h1 class="title">kvm虚拟机系统学习</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h2 id="kvm环境部署(以centos6-4机器搭建)">kvm环境部署(以centos6.4机器搭建)</h2>
+<h3 id="查看系统是否支持虚拟化">查看系统是否支持虚拟化</h3>
+<pre><code>egrep '(vmx|svm)' --color=always /<span class="keyword">proc</span>/cpuinfo
+</code></pre><p><a id="more"></a></p>
+<h3 id="安装虚拟机软件包">安装虚拟机软件包</h3>
+<pre><code>yum install -<span class="keyword">y</span> virt-manager libvirt libvirt-<span class="keyword">python</span> <span class="keyword">python</span>-virtinst virt-top libguestfs-tools
+yum groupinstall <span class="string">"Virtualization Tools"</span> -<span class="keyword">y</span>
+</code></pre><h3 id="启动虚拟机">启动虚拟机</h3>
+<pre><code>/etc/<span class="keyword">init</span>.d/libvirtd start
+</code></pre><h3 id="查看虚拟机环境">查看虚拟机环境</h3>
+<h4 id="查看列表">查看列表</h4>
+<pre><code>virsh -<span class="built_in">c</span> qemu:<span class="comment">///system list</span>
+</code></pre><h4 id="查看kvm模块支持">查看kvm模块支持</h4>
+<pre><code>lsmod|<span class="keyword">grep</span> kvm
+</code></pre><h4 id="查看虚拟工具版本">查看虚拟工具版本</h4>
+<pre><code>virsh <span class="comment">--version</span>
+0.10.2
+virt-<span class="operator"><span class="keyword">install</span>  <span class="comment">--version</span>
+<span class="number">0.600</span><span class="number">.0</span>
+<span class="keyword">ln</span> -s /usr/libexec/qemu-kvm  /usr/<span class="keyword">bin</span>/qemu-kvm
+qemu-kvm <span class="comment">--version    </span>
+QEMU PC emulator <span class="keyword">version</span> <span class="number">0.12</span><span class="number">.1</span> (qemu-kvm-<span class="number">0.12</span><span class="number">.1</span><span class="number">.2</span>), Copyright (c) <span class="number">2003</span>-<span class="number">2008</span> Fabrice Bellard</span>
+</code></pre><h4 id="配置桥接网卡">配置桥接网卡</h4>
+<h5 id="/etc/sysconfig/network-scripts/ifcfg-br0">/etc/sysconfig/network-scripts/ifcfg-br0</h5>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="setting">DEVICE=<span class="value">br0</span></span></div><div class="line"><span class="setting">TYPE=<span class="value">Bridge</span></span></div><div class="line"><span class="setting">ONBOOT=<span class="value"><span class="keyword">yes</span></span></span></div><div class="line"><span class="setting">BOOTPROTO=<span class="value">static</span></span></div><div class="line"><span class="setting">IPADDR=<span class="value"><span class="number">192.168</span>.<span class="number">1.3</span></span></span></div><div class="line"><span class="setting">MASK=<span class="value"><span class="number">255.255</span>.<span class="number">255.0</span></span></span></div></pre></td></tr></table></figure>
+
+<h5 id="/etc/sysconfig/network-scripts/ifcfg-eth0">/etc/sysconfig/network-scripts/ifcfg-eth0</h5>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="setting">DEVICE=<span class="value">eth0</span></span></div><div class="line"><span class="setting">ONBOOT=<span class="value"><span class="keyword">yes</span></span></span></div><div class="line"><span class="setting">BRIDGE=<span class="value">br0</span></span></div></pre></td></tr></table></figure>
+
+<h4 id="查看网桥">查看网桥</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> <span class="title">brctl</span> show</div><div class="line">bridge name	bridge id		STP enabled	interfaces</div><div class="line">br0		<span class="number">8000</span>.902b34194560	<span class="built_in">no</span>		eth0</div><div class="line">							vnet0</div><div class="line">virbr0		<span class="number">8000</span>.525400e4b9c2	<span class="built_in">yes</span>		virbr0-nic</div></pre></td></tr></table></figure>
+
+<h3 id="自动化部署脚本">自动化部署脚本</h3>
+<h4 id="installkvm-sh">installkvm.sh</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="shebang">#!/bin/bash</span></div><div class="line"><span class="comment">#variable</span></div><div class="line">defineIP=<span class="string">'192.168.200.10'</span></div><div class="line">device=<span class="string">'eth0'</span></div><div class="line">netmask=<span class="string">'255.255.255.0'</span></div><div class="line"><span class="comment">#this is a kvm install script</span></div><div class="line"><span class="comment">#function</span></div><div class="line">function <span class="function"><span class="title">InstallRpm</span></span>()</div><div class="line">{</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> $*</div><div class="line"><span class="keyword">do</span></div><div class="line">rpm -q <span class="variable">$i</span> &gt;/dev/null &&<span class="built_in">echo</span> <span class="string">"<span class="variable">$i</span> is installed"</span> || yum install -y <span class="variable">$i</span></div><div class="line"><span class="keyword">done</span></div><div class="line">}</div><div class="line"><span class="comment">#rhel网卡桥接</span></div><div class="line"><span class="comment">#InstallRpm bridge-utils</span></div><div class="line">cat &gt;/etc/sysconfig/network-scripts/ifcfg-br0 &lt;&lt;EOF</div><div class="line">DEVICE=<span class="variable">$device</span></div><div class="line">ONBOOT=yes</div><div class="line">BRIDGE=br0</div><div class="line">EOF</div><div class="line"><span class="comment">###############</span></div><div class="line">cat &gt;/etc/sysconfig/network-scripts/ifcfg-<span class="variable">$device</span> &lt;&lt;EOF</div><div class="line">DEVICE=br0</div><div class="line">TYPE=Bridge</div><div class="line">ONBOOT=yes</div><div class="line">BOOTPROTO=static</div><div class="line">IPADDR=<span class="variable">$IPNET</span></div><div class="line">MASK=<span class="variable">$netmask</span></div><div class="line">EOF</div><div class="line"><span class="comment">#安装虚拟机所需的软件</span></div><div class="line">yum groupinstall <span class="string">"Virtualization Tools"</span> -y</div><div class="line">InstallRpm  virt-manager libvirt libvirt-python python-virtinst virt-top libguestfs-tools</div></pre></td></tr></table></figure>
+
+<h2 id="安装系统">安装系统</h2>
+<h3 id="准备镜像">准备镜像</h3>
+<p>在这里使用centos6.4系统，可以使用cd方式安装，也可以使用网络方式安装(使用网络方式安装，则需要先搭建好网络安装环境)</p>
+<h3 id="开始安装">开始安装</h3>
+<h4 id="raw格式磁盘安装">raw格式磁盘安装</h4>
+<h5 id="iso镜像安装方式">iso镜像安装方式</h5>
+<pre><code><span class="comment">virt</span><span class="literal">-</span><span class="comment">install</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">name=oeltest01</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">ram</span> <span class="comment">512</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vcpus=1</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">disk</span> <span class="comment">path=/data/test02</span><span class="string">.</span><span class="comment">img</span><span class="string">,</span><span class="comment">size=7</span><span class="string">,</span><span class="comment">bus=virtio</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">accelerate</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">cdrom/data/iso/oel58x64</span><span class="string">.</span><span class="comment">iso</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnc</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vncport=5910</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnclisten=0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">network</span> <span class="comment">bridge=br0</span><span class="string">,</span><span class="comment">model=virtio</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">noautoconsole</span>
+</code></pre><h5 id="网络安装方式">网络安装方式</h5>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">	virt-install \</div><div class="line">-<span class="ruby">-name <span class="variable">$IMGNAME</span> \</span></div><div class="line">-<span class="ruby">-ram <span class="number">2000</span> \</span></div><div class="line">-<span class="ruby">-cpu host \</span></div><div class="line">-<span class="ruby">-vcpus <span class="number">4</span> \</span></div><div class="line">-<span class="ruby">-nographics \</span></div><div class="line">-<span class="ruby">-os-type=linux \</span></div><div class="line">-<span class="ruby">-os-variant=rhel6 \</span></div><div class="line">-<span class="ruby">-location=<span class="symbol">ftp:</span>/<span class="regexp">/192.168.1.91/centos</span>6 \</span></div><div class="line">-<span class="ruby">-extra-args=<span class="string">"ks=ftp://192.168.1.91/ks.cfg text console=tty0 utf8 console=ttyS0,115200"</span> \</span></div><div class="line">-<span class="ruby">-disk path=<span class="variable">${</span>diskpath}/<span class="variable">$IMGNAME</span>.<span class="variable">$EXT</span>,size=<span class="variable">${</span>disksize},bus=virtio,format= \</span></div><div class="line">-<span class="ruby">-force \</span></div><div class="line">-<span class="ruby">-noreboot</span></div></pre></td></tr></table></figure>
+
+<h4 id="qcow2格式磁盘安装">qcow2格式磁盘安装</h4>
+<p>采用qcow2磁盘格式，需要事先创建qcow2格式虚拟磁盘</p>
+<pre><code><span class="comment">qemu</span><span class="literal">-</span><span class="comment">img</span> <span class="comment">create</span> <span class="literal">-</span><span class="comment">f</span> <span class="comment">qcow2</span> <span class="comment">test02</span><span class="string">.</span><span class="comment">img</span> <span class="comment">7G</span>
+<span class="comment">virt</span><span class="literal">-</span><span class="comment">install</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">name=oeltest02</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">os</span><span class="literal">-</span><span class="comment">variant=RHEL5</span><span class="string">.</span><span class="comment">8</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">ram</span> <span class="comment">512</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vcpus=1</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">disk</span> <span class="comment">path=/data/test02</span><span class="string">.</span><span class="comment">img</span><span class="string">,</span><span class="comment">format=qcow2</span><span class="string">,</span><span class="comment">size=7</span><span class="string">,</span><span class="comment">bus=virtio</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">accelerate</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">cdrom</span> <span class="comment">/data/iso/oel58x64</span><span class="string">.</span><span class="comment">iso</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnc</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vncport=5910</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnclisten=0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">network</span> <span class="comment">bridge=br0</span><span class="string">,</span><span class="comment">model=virtio</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">noautoconsole</span>
+</code></pre><h3 id="参数说明">参数说明</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">--name指定虚拟机名称</div><div class="line">--ram分配内存大小。</div><div class="line">--vcpus分配CPU核心数，最大与实体机CPU核心数相同</div><div class="line">--disk指定虚拟机镜像，size指定分配大小单位为G。</div><div class="line">--network网络类型，此处用的是默认，一般用的应该是bridge桥接。</div><div class="line">--accelerate加速</div><div class="line">--cdrom指定安装镜像iso</div><div class="line">--vnc启用VNC远程管理，一般安装系统都要启用。</div><div class="line">--vncport指定VNC监控端口，默认端口为<span class="number">5900</span>，端口不能重复。</div><div class="line">--vnclisten指定VNC绑定IP，默认绑定<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>，这里改为<span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span>。</div><div class="line">--os-type=linux,windows</div><div class="line">--os-variant=</div><div class="line"><span class="label">win7:</span>MicrosoftWindows7</div><div class="line"><span class="label">vista:</span>MicrosoftWindowsVista</div><div class="line"><span class="label">winxp64:</span>MicrosoftWindowsXP(x86_64)</div><div class="line"><span class="label">winxp:</span>MicrosoftWindowsXP</div><div class="line"><span class="label">win2k8:</span>MicrosoftWindowsServer2008</div><div class="line"><span class="label">win2k3:</span>MicrosoftWindowsServer2003</div><div class="line"><span class="label">freebsd8:</span>FreeBSD8.x</div><div class="line"><span class="label">generic:</span>Generic</div><div class="line"><span class="label">debiansqueeze:</span>DebianSqueeze</div><div class="line"><span class="label">debianlenny:</span>DebianLenny</div><div class="line"><span class="label">fedora16:</span>Fedora16</div><div class="line"><span class="label">fedora15:</span>Fedora15</div><div class="line"><span class="label">fedora14:</span>Fedora14</div><div class="line"><span class="label">mes5.1:</span>MandrivaEnterpriseServer5<span class="number">.1</span>andlater</div><div class="line"><span class="label">mandriva2010:</span>MandrivaLinux2010andlater</div><div class="line"><span class="label">rhel6:</span>RedHatEnterpriseLinux6</div><div class="line"><span class="label">rhel5.4:</span>RedHatEnterpriseLinux5<span class="number">.4</span>orlater</div><div class="line"><span class="label">rhel4:</span>RedHatEnterpriseLinux4</div><div class="line"><span class="label">sles11:</span>SuseLinuxEnterpriseServer11</div><div class="line"><span class="label">sles10:</span>SuseLinuxEnterpriseServer</div><div class="line"><span class="label">ubuntuoneiric:</span>Ubuntu11<span class="number">.10</span>(OneiricOcelot)</div><div class="line"><span class="label">ubuntunatty:</span>Ubuntu11<span class="number">.04</span>(NattyNarwhal)</div><div class="line"><span class="label">ubuntumaverick:</span>Ubuntu10<span class="number">.10</span>(MaverickMeerkat)</div><div class="line"><span class="label">ubuntulucid:</span>Ubuntu10<span class="number">.04</span>(LucidLynx)</div><div class="line"><span class="label">ubuntuhardy:</span>Ubuntu8<span class="number">.04</span>LTS(HardyHeron)</div></pre></td></tr></table></figure>
+
+<h2 id="虚拟机常用操作">虚拟机常用操作</h2>
+<h3 id="KVM虚拟机默认配置文件">KVM虚拟机默认配置文件</h3>
+<p>配置文件目录：/etc/libvirt/qemu<br>autostart目录是配置kvm虚拟机开机自启动目录。</p>
+<h3 id="virsh命令帮助">virsh命令帮助</h3>
+<pre><code>virsh --<span class="keyword">help</span>
+</code></pre><p>或直接virsh命令在执行help子命令</p>
+<h3 id="查看kvm虚拟机状态">查看kvm虚拟机状态</h3>
+<pre><code>virsh <span class="keyword">list</span> --<span class="keyword">all</span>
+</code></pre><h3 id="KVM虚拟机开机">KVM虚拟机开机</h3>
+<pre><code>virsh <span class="operator"><span class="keyword">start</span> 虚拟名称</span>
+</code></pre><h3 id="虚拟机关机或断电">虚拟机关机或断电</h3>
+<h4 id="关机">关机</h4>
+<p>默认情况下virsh工具不能对linux虚拟机进行关机操作，linux操作系统需要开启与启动acpid服务。在安装KVM linux虚拟机必须配置此服务。</p>
+<pre><code><span class="preprocessor"># chkconfig acpid on   </span>
+<span class="preprocessor"># service acpid restart</span>
+</code></pre><p>virsh关机</p>
+<pre><code>virsh <span class="keyword">shutdown</span> oeltest01
+</code></pre><h4 id="强制关闭电源">强制关闭电源</h4>
+<pre><code><span class="title">virsh</span> destroy wintest01
+</code></pre><h4 id="通过配置文件启动虚拟机">通过配置文件启动虚拟机</h4>
+<pre><code> virsh <span class="operator"><span class="keyword">create</span> /etc/libvirt/qemu/wintest01.<span class="keyword">xml</span></span>
+</code></pre><h4 id="配置开机自启动虚拟机">配置开机自启动虚拟机</h4>
+<pre><code><span class="title">virsh</span> autostart  虚拟机名字
+</code></pre><p>autostart目录是kvm虚拟机开机自启动目录，可以看到该目录中有KVM配置文件链接。/etc/libvirt/qemu/autostart</p>
+<h4 id="导出KVM虚拟机配置文件">导出KVM虚拟机配置文件</h4>
+<pre><code><span class="input"><span class="prompt">virsh dumpxml wintest01 &gt;</span> /etc/libvirt/qemu/wintest02.xml </span>
+</code></pre><p>KVM虚拟机配置文件可以通过这种方式进行备份。</p>
+<h4 id="添加与删除KVM虚拟机">添加与删除KVM虚拟机</h4>
+<h5 id="删除kvm虚拟机">删除kvm虚拟机</h5>
+<pre><code><span class="title">virsh</span> undefine wintest01虚拟机名字
+</code></pre><p>说明：该命令只是删除wintest01的配置文件，并不删除虚拟磁盘文件。</p>
+<h5 id="重新定义虚拟机配置文件">重新定义虚拟机配置文件</h5>
+<p>通过导出备份的配置文件恢复原KVM虚拟机的定义，并重新定义虚拟机。</p>
+<pre><code>mv <span class="regexp">/etc/</span>libvirt<span class="regexp">/qemu/</span>wintest02.xml <span class="regexp">/etc/</span>libvirt<span class="regexp">/qemu/</span>wintest01.xml 
+virsh define <span class="regexp">/etc/</span>libvirt<span class="regexp">/qemu/</span>wintest01.xml 
+</code></pre><h4 id="编辑KVM虚拟机配置文件">编辑KVM虚拟机配置文件</h4>
+<pre><code>virsh <span class="keyword">edit</span> wintest01 
+</code></pre><p>virsh edit将调用vi命令编辑/etc/libvirt/qemu/wintest01.xml配置文件。也可以直接通过vi命令进行编辑，修改，保存。可以但不建议直接通过vi编辑。</p>
+<h4 id="virsh_console控制台管理Linux虚拟机">virsh console控制台管理Linux虚拟机</h4>
+<pre><code>virsh <span class="built_in">console</span> 虚拟机名字
+</code></pre><h4 id="挂起服务器">挂起服务器</h4>
+<pre><code>virsh <span class="keyword">suspend</span> 虚拟机名字
+</code></pre><h4 id="恢复服务器">恢复服务器</h4>
+<pre><code>virsh <span class="keyword">resume</span> 虚拟机名字
+</code></pre><h2 id="使用控制端进行登录配置">使用控制端进行登录配置</h2>
+<pre><code>默认是不能使用<span class="built_in">console</span>进行直接登录新的虚拟机的，有两种方式可以实现登录。
+</code></pre><ul>
+<li>第一种方式是，在进行virsh-install安装时添加选项，—extra-args=console=ttyS0,115200进行安装即可 </li>
+<li>第二种方式<ul>
+<li>进入安装后的虚拟机<br>  echo “ttyS0” &gt;&gt;/etc/securetty</li>
+<li>修改/etc/grub.conf文件,添加console选项<br>   kernel /vmlinuz-2.6.32-358.el6.x86_64 ro root=UUID=b6c2e51f-de8a-4b18-946e-5f34450d5118 rd_NO_LUKS rd_NO_LVM rd_NO_MD <code>console=ttyS0,115200</code></li>
+<li>修改/etc/inittab文件<pre><code>加入<span class="constant">S0</span><span class="symbol">:</span><span class="number">12345</span><span class="symbol">:respawn</span><span class="symbol">:/sbin/agetty</span> ttyS<span class="number">0</span> <span class="number">115200</span>
+</code></pre></li>
+</ul>
+</li>
+</ul>
+<h2 id="克隆虚拟机">克隆虚拟机</h2>
+<p>kvm虚拟机的克隆分为两种情况</p>
+<ul>
+<li>KVM主机本机虚拟机直接克隆。</li>
+<li>通过复制配置文件与磁盘文件的虚拟机复制克隆(适用于异机的静态迁移)。<h3 id="本机虚拟机直接克隆">本机虚拟机直接克隆</h3>
+<h4 id="查看虚拟机配置文件">查看虚拟机配置文件</h4>
+<strong>/etc/libvirt/qemu/test.xml</strong></li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">domain</span> <span class="attribute">type</span>=<span class="value">'kvm'</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">name</span>&gt;</span>test<span class="tag">&lt;/<span class="title">name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">uuid</span>&gt;</span>06b76e31-c886-045f-6da9-d126ad65f542<span class="tag">&lt;/<span class="title">uuid</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">memory</span> <span class="attribute">unit</span>=<span class="value">'KiB'</span>&gt;</span>2048000<span class="tag">&lt;/<span class="title">memory</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">currentMemory</span> <span class="attribute">unit</span>=<span class="value">'KiB'</span>&gt;</span>2048000<span class="tag">&lt;/<span class="title">currentMemory</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">vcpu</span> <span class="attribute">placement</span>=<span class="value">'static'</span>&gt;</span>4<span class="tag">&lt;/<span class="title">vcpu</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">os</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">type</span> <span class="attribute">arch</span>=<span class="value">'x86_64'</span> <span class="attribute">machine</span>=<span class="value">'rhel6.4.0'</span>&gt;</span>hvm<span class="tag">&lt;/<span class="title">type</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">boot</span> <span class="attribute">dev</span>=<span class="value">'hd'</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">os</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">features</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">acpi</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">apic</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">pae</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">features</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">cpu</span> <span class="attribute">mode</span>=<span class="value">'custom'</span> <span class="attribute">match</span>=<span class="value">'exact'</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">model</span> <span class="attribute">fallback</span>=<span class="value">'allow'</span>&gt;</span>Nehalem<span class="tag">&lt;/<span class="title">model</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">vendor</span>&gt;</span>Intel<span class="tag">&lt;/<span class="title">vendor</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'avx'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'vme'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'dtes64'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'xsave'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'vmx'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'xtpr'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'pcid'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'est'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'monitor'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'tm'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'pclmuldq'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'acpi'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'tsc-deadline'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'osxsave'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'tm2'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'ht'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'pdcm'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'ds'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'rdtscp'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'ss'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'pbe'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">feature</span> <span class="attribute">policy</span>=<span class="value">'require'</span> <span class="attribute">name</span>=<span class="value">'ds_cpl'</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">cpu</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">clock</span> <span class="attribute">offset</span>=<span class="value">'utc'</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">on_poweroff</span>&gt;</span>destroy<span class="tag">&lt;/<span class="title">on_poweroff</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">on_reboot</span>&gt;</span>restart<span class="tag">&lt;/<span class="title">on_reboot</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">on_crash</span>&gt;</span>restart<span class="tag">&lt;/<span class="title">on_crash</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">devices</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">emulator</span>&gt;</span>/usr/libexec/qemu-kvm<span class="tag">&lt;/<span class="title">emulator</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">disk</span> <span class="attribute">type</span>=<span class="value">'file'</span> <span class="attribute">device</span>=<span class="value">'disk'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">driver</span> <span class="attribute">name</span>=<span class="value">'qemu'</span> <span class="attribute">type</span>=<span class="value">'qcow2'</span> <span class="attribute">cache</span>=<span class="value">'none'</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">source</span> <span class="attribute">file</span>=<span class="value">'/data/vm/test.qcow2'</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">target</span> <span class="attribute">dev</span>=<span class="value">'vda'</span> <span class="attribute">bus</span>=<span class="value">'virtio'</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x04'</span> <span class="attribute">function</span>=<span class="value">'0x0'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">disk</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">controller</span> <span class="attribute">type</span>=<span class="value">'usb'</span> <span class="attribute">index</span>=<span class="value">'0'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x01'</span> <span class="attribute">function</span>=<span class="value">'0x2'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">controller</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">type</span>=<span class="value">'bridge'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">mac</span> <span class="attribute">address</span>=<span class="value">'52:54:00:5a:09:e7'</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">source</span> <span class="attribute">bridge</span>=<span class="value">'br0'</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">model</span> <span class="attribute">type</span>=<span class="value">'virtio'</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x03'</span> <span class="attribute">function</span>=<span class="value">'0x0'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">serial</span> <span class="attribute">type</span>=<span class="value">'pty'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">target</span> <span class="attribute">port</span>=<span class="value">'0'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">serial</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">console</span> <span class="attribute">type</span>=<span class="value">'pty'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">target</span> <span class="attribute">type</span>=<span class="value">'serial'</span> <span class="attribute">port</span>=<span class="value">'0'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">console</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">'tablet'</span> <span class="attribute">bus</span>=<span class="value">'usb'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="title">memballoon</span> <span class="attribute">model</span>=<span class="value">'virtio'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x05'</span> <span class="attribute">function</span>=<span class="value">'0x0'</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="title">memballoon</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="title">devices</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="title">domain</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h4 id="虚拟机磁盘文件">虚拟机磁盘文件</h4>
+<pre><code>/<span class="typedef"><span class="keyword">data</span>/vm/test.img</span>
+</code></pre><h4 id="虚拟机名称:test">虚拟机名称:test</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">virsh list --all</div><div class="line"><span class="header"> Id    名称                         状态</span></div><div class="line">----------------------------------------------------</div><div class="line"><span class="code"> 37    test                           running</span></div></pre></td></tr></table></figure>
+
+<h4 id="开始克隆">开始克隆</h4>
+<pre><code><span class="title">virt</span>-clone -o test -n test01 -f /<span class="typedef"><span class="keyword">data</span>/test.img</span>
+</code></pre><p>以test做为源，克隆test01虚拟机，并创建名称为test01虚拟机，使用磁盘文件/data/test.img</p>
+<h4 id="启动虚拟机并配置主机名，IP地址，以及/etc/udev/rules-d/70-persistent-net-rules文件的修改">启动虚拟机并配置主机名，IP地址，以及/etc/udev/rules.d/70-persistent-net.rules文件的修改</h4>
+<h3 id="复制配置文件与磁盘文件克隆">复制配置文件与磁盘文件克隆</h3>
+<h4 id="导入kvm虚拟机配置文件">导入kvm虚拟机配置文件</h4>
+<p>这里采用test做为模板，进行克隆。</p>
+<h5 id="关闭虚拟机">关闭虚拟机</h5>
+<pre><code>virsh shutdown <span class="keyword">test</span>
+</code></pre><h5 id="备份配置文件">备份配置文件</h5>
+<pre><code><span class="input"><span class="prompt">virsh dumpxml test &gt;</span> /etc/libvirt/qemu/test1.xml</span>
+</code></pre><h5 id="复制KVM虚拟机磁盘文件">复制KVM虚拟机磁盘文件</h5>
+<p>虚拟磁盘文件位置可以查看配置文件<code>/etc/libvirt/qemu/test.xml</code> 查看<code>&lt;source file=&#39;/data/vm/test.img&#39;/&gt;</code><br>    找到位置后，直接使用cp命令进行拷贝</p>
+<pre><code><span class="keyword">cp</span> test.img test1.img
+</code></pre><h5 id="直接编辑修改配置文件">直接编辑修改配置文件</h5>
+<p>修改name,uuid,disk位置,vnc端口，使用vim进行编辑</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">domain</span> <span class="attribute">type</span>=<span class="value">'kvm'</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">name</span>&gt;</span>test<span class="tag">&lt;/<span class="title">name</span>&gt;</span>       </div><div class="line">  <span class="tag">&lt;<span class="title">uuid</span>&gt;</span>8f2bb4a7-c7ed-32aa-3676-9fb05923260d<span class="tag">&lt;/<span class="title">uuid</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="title">memory</span> <span class="attribute">unit</span>=<span class="value">'KiB'</span>&gt;</span>524288<span class="tag">&lt;/<span class="title">memory</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">currentMemory</span> <span class="attribute">unit</span>=<span class="value">'KiB'</span>&gt;</span>524288<span class="tag">&lt;/<span class="title">currentMemory</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">vcpu</span> <span class="attribute">placement</span>=<span class="value">'static'</span>&gt;</span>1<span class="tag">&lt;/<span class="title">vcpu</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">os</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">type</span> <span class="attribute">arch</span>=<span class="value">'x86_64'</span> <span class="attribute">machine</span>=<span class="value">'rhel6.4.0'</span>&gt;</span>hvm<span class="tag">&lt;/<span class="title">type</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">boot</span> <span class="attribute">dev</span>=<span class="value">'hd'</span>/&gt;</span>    </div><div class="line">  <span class="tag">&lt;/<span class="title">os</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">features</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">acpi</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">apic</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">pae</span>/&gt;</span>    </div><div class="line">  <span class="tag">&lt;/<span class="title">features</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">clock</span> <span class="attribute">offset</span>=<span class="value">'utc'</span>/&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">on_poweroff</span>&gt;</span>destroy<span class="tag">&lt;/<span class="title">on_poweroff</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">on_reboot</span>&gt;</span>restart<span class="tag">&lt;/<span class="title">on_reboot</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">on_crash</span>&gt;</span>restart<span class="tag">&lt;/<span class="title">on_crash</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="title">devices</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">emulator</span>&gt;</span>/usr/libexec/qemu-kvm<span class="tag">&lt;/<span class="title">emulator</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">disk</span> <span class="attribute">type</span>=<span class="value">'file'</span> <span class="attribute">device</span>=<span class="value">'disk'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">driver</span> <span class="attribute">name</span>=<span class="value">'qemu'</span> <span class="attribute">type</span>=<span class="value">'raw'</span> <span class="attribute">cache</span>=<span class="value">'none'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">source</span> <span class="attribute">file</span>=<span class="value">'/data/test03.img'</span>/&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">target</span> <span class="attribute">dev</span>=<span class="value">'hda'</span> <span class="attribute">bus</span>=<span class="value">'ide'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'drive'</span> <span class="attribute">controller</span>=<span class="value">'0'</span> <span class="attribute">bus</span>=<span class="value">'0'</span> <span class="attribute">target</span>=<span class="value">'0'</span> <span class="attribute">unit</span>=<span class="value">'0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">disk</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">disk</span> <span class="attribute">type</span>=<span class="value">'block'</span> <span class="attribute">device</span>=<span class="value">'cdrom'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">driver</span> <span class="attribute">name</span>=<span class="value">'qemu'</span> <span class="attribute">type</span>=<span class="value">'raw'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">target</span> <span class="attribute">dev</span>=<span class="value">'hdc'</span> <span class="attribute">bus</span>=<span class="value">'ide'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">readonly</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'drive'</span> <span class="attribute">controller</span>=<span class="value">'0'</span> <span class="attribute">bus</span>=<span class="value">'1'</span> <span class="attribute">target</span>=<span class="value">'0'</span> <span class="attribute">unit</span>=<span class="value">'0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">disk</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">controller</span> <span class="attribute">type</span>=<span class="value">'usb'</span> <span class="attribute">index</span>=<span class="value">'0'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x01'</span> <span class="attribute">function</span>=<span class="value">'0x2'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">controller</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">controller</span> <span class="attribute">type</span>=<span class="value">'ide'</span> <span class="attribute">index</span>=<span class="value">'0'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x01'</span> <span class="attribute">function</span>=<span class="value">'0x1'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">controller</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">type</span>=<span class="value">'bridge'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">mac</span> <span class="attribute">address</span>=<span class="value">'52:54:00:82:39:01'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">source</span> <span class="attribute">bridge</span>=<span class="value">'br0'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">model</span> <span class="attribute">type</span>=<span class="value">'virtio'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x03'</span> <span class="attribute">function</span>=<span class="value">'0x0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">serial</span> <span class="attribute">type</span>=<span class="value">'pty'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">target</span> <span class="attribute">port</span>=<span class="value">'0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">serial</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">console</span> <span class="attribute">type</span>=<span class="value">'pty'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">target</span> <span class="attribute">type</span>=<span class="value">'serial'</span> <span class="attribute">port</span>=<span class="value">'0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">console</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">'tablet'</span> <span class="attribute">bus</span>=<span class="value">'usb'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">'mouse'</span> <span class="attribute">bus</span>=<span class="value">'ps2'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">graphics</span> <span class="attribute">type</span>=<span class="value">'vnc'</span> <span class="attribute">port</span>=<span class="value">'5911'</span> <span class="attribute">autoport</span>=<span class="value">'no'</span> <span class="attribute">listen</span>=<span class="value">'0.0.0.0'</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="title">listen</span> <span class="attribute">type</span>=<span class="value">'address'</span> <span class="attribute">address</span>=<span class="value">'0.0.0.0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">graphics</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">video</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">model</span> <span class="attribute">type</span>=<span class="value">'cirrus'</span> <span class="attribute">vram</span>=<span class="value">'9216'</span> <span class="attribute">heads</span>=<span class="value">'1'</span>/&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x02'</span> <span class="attribute">function</span>=<span class="value">'0x0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">video</span>&gt;</span>    </div><div class="line">    <span class="tag">&lt;<span class="title">memballoon</span> <span class="attribute">model</span>=<span class="value">'virtio'</span>&gt;</span>    </div><div class="line">      <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x04'</span> <span class="attribute">function</span>=<span class="value">'0x0'</span>/&gt;</span>    </div><div class="line">    <span class="tag">&lt;/<span class="title">memballoon</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;/<span class="title">devices</span>&gt;</span>    </div><div class="line"><span class="tag">&lt;/<span class="title">domain</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h4 id="定义新虚拟机配置文件">定义新虚拟机配置文件</h4>
+<pre><code>virsh define <span class="regexp">/etc/</span>libvirt<span class="regexp">/qemu/</span>test1.xml
+</code></pre><h4 id="启动虚拟机-1">启动虚拟机</h4>
+<pre><code>virsh <span class="operator"><span class="keyword">start</span> test1</span>
+</code></pre><h4 id="登录虚拟机进行主机名、IP修改，以及/etc/udev/rules-d/70-persistent-net-rules文件的修改">登录虚拟机进行主机名、IP修改，以及/etc/udev/rules.d/70-persistent-net.rules文件的修改</h4>
+<h2 id="kvm虚拟机vnc配置">kvm虚拟机vnc配置</h2>
+<p>这里的通过vnc方式访问虚拟机不是在kvm虚拟机安装配置vnc服务器，通过虚拟主机的IP地址与端口进行访问，kvm虚拟化对vnc的支持相对来说比xen要好很多，在虚拟主机上配置VNC访问虚拟机，也是为了多提供一种方式访问虚拟机而已。</p>
+<h3 id="修改qemu-conf">修改qemu.conf</h3>
+<pre><code> <span class="keyword">vi</span> /etc/libvirt/qemu.<span class="keyword">conf</span> 
+vnc_listen = <span class="string">"0.0.0.0"</span>
+</code></pre><ul>
+<li>vnclisten 默认绑定127.0.0.1 在配置文件里指定VNC 绑定0.0.0.0IP,就不用在安装kvm虚拟机时指定vnclisten参数了。</li>
+<li>在虚拟主机上有很多个虚拟机的时候，需要指定每个虚拟机的端口，否则将会很乱。</li>
+</ul>
+<h3 id="修改虚拟机配置文件">修改虚拟机配置文件</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">virsh edit test</div><div class="line">&lt;graphics <span class="class"><span class="keyword">type</span></span>=<span class="string">'vnc'</span> port=<span class="string">'5910'</span> autoport=<span class="string">'no'</span> listen=<span class="string">'0.0.0.0'</span>&gt;       </div><div class="line">&lt;listen <span class="class"><span class="keyword">type</span></span>=<span class="string">'address'</span> address=<span class="string">'0.0.0.0'</span>/&gt;        </div><div class="line">&lt;/graphics&gt;</div></pre></td></tr></table></figure>
+
+<h3 id="启动虚拟机，并查看端口">启动虚拟机，并查看端口</h3>
+<pre><code>virsh start <span class="keyword">test</span>
+netstat -ntplu
+</code></pre><h2 id="虚拟机时间配置">虚拟机时间配置</h2>
+<p>在虚拟化环境中，虚拟机在长时间运行过程中，时间会变慢，通常的作法是配置ntpdate定时与时间服务器进行时间同步的计划任务。KVM虚拟机默认采用utc时间，需要专门修改，以及考虑kvm时间同步问题。</p>
+<h3 id="kvm虚拟机修改时间配置文件">kvm虚拟机修改时间配置文件</h3>
+<p>kvm虚拟机采用utc时间，需要先修改配置文件使用KVM虚拟机的时间与虚拟主机同步。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">virsh edit test  </div><div class="line"><span class="tag">&lt;<span class="title">clock</span> <span class="attribute">offset</span>=<span class="value">'utc'</span> /&gt;</span>  </div><div class="line">修改为 <span class="tag">&lt;/<span class="title">clock</span> <span class="attribute">offset</span>=<span class="value">'localtime'</span>/&gt;</span></div></pre></td></tr></table></figure>
+
+<h3 id="保存退出，重新启动虚拟机">保存退出，重新启动虚拟机</h3>
+<h3 id="关于kvm虚拟机时间问题解决思路">关于kvm虚拟机时间问题解决思路</h3>
+<ul>
+<li>虚拟机时间慢是所有虚拟化平台的一共性问题。</li>
+<li>解决时间的最终解决方法就是在生产环境中配置时间服务器，kvm虚拟化服务器与kvm机均都要配置时间同步的计划任务，这才是解决这一个问题最终解决方案。</li>
+</ul>
+<h2 id="kvm快照备份">kvm快照备份</h2>
+<p>kvm虚拟机默认使用raw格式的镜像格式，性能最好，速度最快，它的缺点就是不支持一些新的功能，如支持镜像,zlib磁盘压缩,AES加密等<br>要使用镜像功能，磁盘格式必须为qcow2。</p>
+<h3 id="查看现有磁盘镜像格式">查看现有磁盘镜像格式</h3>
+<pre><code>qemu-img info test.img
+<span class="keyword">image</span>: test.img
+<span class="keyword">file</span> <span class="keyword">format</span>: raw
+virtual <span class="keyword">size</span>: <span class="number">80</span>G (<span class="number">85899345920</span> bytes)
+disk <span class="keyword">size</span>: <span class="number">2.4</span>G
+</code></pre><h3 id="转换格式">转换格式</h3>
+<h4 id="关闭虚拟机-1">关闭虚拟机</h4>
+<pre><code>virsh shutdown <span class="keyword">test</span>
+</code></pre><h4 id="转换磁盘格式">转换磁盘格式</h4>
+<pre><code>qemu-img convert -f raw -O qcow2 <span class="keyword">test</span>.img <span class="keyword">test</span>.qcow2 
+</code></pre><ul>
+<li>-f  源镜像的格式   </li>
+<li>-O 目标镜像的格式    <h4 id="再次查看磁盘镜像格式">再次查看磁盘镜像格式</h4>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">qemu-img info test1.img</div><div class="line"><span class="keyword">image</span>: test.qcow2</div><div class="line"><span class="keyword">file</span> <span class="keyword">format</span>: qcow2</div><div class="line">virtual <span class="keyword">size</span>: <span class="number">80</span>G (<span class="number">85899345920</span> bytes)</div><div class="line">disk <span class="keyword">size</span>: <span class="number">2.3</span>G</div><div class="line">cluster_size: <span class="number">65536</span></div></pre></td></tr></table></figure>
+
+<h3 id="修改虚拟机配置文件-1">修改虚拟机配置文件</h3>
+<p>修改磁盘格式,与新qcow2格式的磁盘</p>
+<pre><code>virsh <span class="keyword">edit</span> test
+&lt;driver name=<span class="string">'qemu'</span> <span class="built_in">type</span>=<span class="string">'qcow2'</span> cache=<span class="string">'none'</span>/&gt;
+&lt;<span class="keyword">source</span> <span class="keyword">file</span>=<span class="string">'/data/vm/test.qcow2'</span>/&gt;    
+</code></pre><h3 id="对虚拟机进行快照管理">对虚拟机进行快照管理</h3>
+<h4 id="对test虚拟机创建快照">对test虚拟机创建快照</h4>
+<pre><code>virsh snaopshot-<span class="built_in">create</span> test(虚拟机机名字)  <span class="comment">#会自动生成一个快照名字</span>
+</code></pre><p>也可以自定义快照名  <code>virsh snapshot-create-as test snap1</code> </p>
+<h4 id="查看虚拟机镜像快照的版本">查看虚拟机镜像快照的版本</h4>
+<pre><code>virsh snapshot --<span class="keyword">list</span> test
+</code></pre><h4 id="查看当前虚拟机镜像快照的版本">查看当前虚拟机镜像快照的版本</h4>
+<pre><code>virsh snapshot-current test |<span class="keyword">grep</span> -A1 <span class="string">'&lt;domainsnapshot&gt;'</span>|<span class="keyword">grep</span> -<span class="keyword">v</span> <span class="string">'&lt;domainsnapshot&gt;'</span>|awk -F<span class="string">'[&lt;&gt;]'</span> <span class="string">'{print $3}'</span>
+</code></pre><h4 id="查看当前虚拟机镜像文件">查看当前虚拟机镜像文件</h4>
+<pre><code>qemu-img info <span class="keyword">test</span>.qcow2
+</code></pre><p>快照配置文件在<code>/var/lib/libvirt/qemu/snapshot/</code>虚拟机名称/下</p>
+<h4 id="恢复虚拟机快照">恢复虚拟机快照</h4>
+<h5 id="恢复虚拟机快照必须关闭虚拟机。">恢复虚拟机快照必须关闭虚拟机。</h5>
+<pre><code>virsh shutdown <span class="keyword">test</span>
+</code></pre><h5 id="确认虚拟机是关机状态">确认虚拟机是关机状态</h5>
+<pre><code>virsh domstate <span class="keyword">test</span>
+</code></pre><h5 id="确认需要恢复的快照时间">确认需要恢复的快照时间</h5>
+<pre><code>virsh snapshot-<span class="keyword">list</span> test <span class="comment">#可以查看快照</span>
+</code></pre><h5 id="执行恢复,恢复到快照">执行恢复,恢复到快照</h5>
+<pre><code>virsh snapshot-revert <span class="keyword">test</span> snap1
+</code></pre><h5 id="查看虚拟机快照">查看虚拟机快照</h5>
+<pre><code>qemu-img info <span class="keyword">test</span>.qcow2
+</code></pre><h5 id="删除快照">删除快照</h5>
+<pre><code>virsh <span class="keyword">snapshot</span>-<span class="keyword">delete</span> test snap1
+</code></pre><h2 id="kvm虚拟机扩展磁盘空间">kvm虚拟机扩展磁盘空间</h2>
+<p>kvm虚拟机磁盘空间扩展与xen虚拟机磁盘空间扩展思路一致。原因在于xen/kvm默认的虚拟机磁盘格式为raw,所以方式可以通用。</p>
+<h3 id="raw磁盘格式扩展思路">raw磁盘格式扩展思路</h3>
+<ul>
+<li>新添加一块raw格式的磁盘加入到KVM虚拟机,然后通过虚拟机系统lvm逻辑卷管理方式进行管理，扩展磁盘空间。</li>
+<li>直接通过dd命令扩展现有虚拟机磁盘大小,扩展之后,原磁盘大小增大,进入虚拟机系统后,直接通过fdisk分区新添加的空间,然后将该分区并入lvm逻辑卷中,扩大磁盘空间。</li>
+</ul>
+<h3 id="qcow2磁盘格式扩展思路如下">qcow2磁盘格式扩展思路如下</h3>
+<ul>
+<li>可以采用raw磁盘格式磁盘的扩展方式一致的方式进行。</li>
+<li>qcow2格式磁盘，直接通过qemu-img 直接扩展qcow2磁盘, 新添加一块raw格式的磁盘加入到KVM虚拟机,然后通过虚拟机系统lvm逻辑卷管理方式进行管理,扩展磁盘空间。</li>
+</ul>
+<h3 id="方式一：添加一块qcow2磁盘加入虚拟机">方式一：添加一块qcow2磁盘加入虚拟机</h3>
+<h4 id="查看虚拟机磁盘信息">查看虚拟机磁盘信息</h4>
+<pre><code>virsh edit <span class="keyword">test</span>
+qemu-img info <span class="keyword">test</span>.qcow2
+</code></pre><h4 id="进入虚拟机，查看磁盘容量">进入虚拟机，查看磁盘容量</h4>
+<h4 id="添加一块qcow2磁盘">添加一块qcow2磁盘</h4>
+<pre><code>qemu-img create <span class="operator">-f</span> qcow2 test_add.qcow2 <span class="number">2</span>G
+</code></pre><h4 id="添加一块qcow2磁盘信息加入配置文件">添加一块qcow2磁盘信息加入配置文件</h4>
+<ul>
+<li><p>关闭虚拟机</p>
+<p>  virsh shutdown test</p>
+</li>
+<li><p>查看是否关闭</p>
+<p>  virsh list —all</p>
+</li>
+<li>在配置文件中加入新增磁盘信息<br><strong>virsh edit test</strong></li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">disk</span> <span class="attribute">type</span>=<span class="value">'file'</span> <span class="attribute">device</span>=<span class="value">'disk'</span>&gt;</span>     </div><div class="line">  <span class="tag">&lt;<span class="title">driver</span> <span class="attribute">name</span>=<span class="value">'qemu'</span> <span class="attribute">type</span>=<span class="value">'qcow2'</span> <span class="attribute">cache</span>=<span class="value">'none'</span>/&gt;</span>      </div><div class="line">  <span class="tag">&lt;<span class="title">source</span> <span class="attribute">file</span>=<span class="value">'/data/test01_add.qcow2'</span>/&gt;</span>      </div><div class="line">  <span class="tag">&lt;<span class="title">target</span> <span class="attribute">dev</span>=<span class="value">'hdb'</span> <span class="attribute">bus</span>=<span class="value">'ide'</span>/&gt;</span>      </div><div class="line"> <span class="tag">&lt;/<span class="title">disk</span>&gt;</span></div></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>启动虚拟机并配置磁盘</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">virsh start <span class="keyword">test</span></div><div class="line">virsh console <span class="keyword">test</span></div></pre></td></tr></table></figure>
+
+<ul>
+<li><p>进入虚拟机，查看磁盘是否加入</p>
+<p>   fdisk -l</p>
+</li>
+<li>配置LVM扩展磁盘</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span>、新磁盘分区</div><div class="line"><span class="number">2</span>、扩展LVM逻辑卷</div><div class="line">pvcreate /dev/hdb1</div><div class="line">vgextend vg /dev/hdb1</div><div class="line">lvextend <span class="operator">-l</span> +<span class="number">100</span>%FREE /dev/vg/root</div><div class="line">resize2fs /dev/vg/root</div></pre></td></tr></table></figure>
+
+<h3 id="方式二：直接扩展qcow2磁盘">方式二：直接扩展qcow2磁盘</h3>
+<h4 id="查看磁盘">查看磁盘</h4>
+<pre><code>virsh <span class="keyword">edit</span> test
+</code></pre><h4 id="直接扩展qcow2磁盘">直接扩展qcow2磁盘</h4>
+<pre><code>qemu-img <span class="keyword">resize</span> test.qcow2 +<span class="number">2</span>G
+</code></pre><p>可以在前后使用qemu-img info test.qcow2进行查看空间大小</p>
+<blockquote>
+<p>经过前后对比，磁盘大小已由7G扩展到9G,已扩展,qcow2磁盘格式必须采用此方式进行扩展，不要使用dd方式,dd方式适用于raw格式。</p>
+</blockquote>
+<h4 id="进入虚拟机直接查看分区，即可看到磁盘空间已经增大，直接分区直接使用即可">进入虚拟机直接查看分区，即可看到磁盘空间已经增大，直接分区直接使用即可</h4>
+<h2 id="linux虚拟机在线扩展磁盘">linux虚拟机在线扩展磁盘</h2>
+<h3 id="安装虚拟机，修改磁盘为virtio驱动">安装虚拟机，修改磁盘为virtio驱动</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#</span> <span class="comment">virt</span><span class="literal">-</span><span class="comment">install</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">name=oeltest02</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">os</span><span class="literal">-</span><span class="comment">variant=RHEL6</span><span class="string">.</span><span class="comment">3</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">ram</span> <span class="comment">512</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vcpus=1</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">disk</span> <span class="comment">path=/data/test01</span><span class="string">.</span><span class="comment">qcow2</span><span class="string">,</span><span class="comment">format=qcow2</span><span class="string">,</span><span class="comment">size=7</span><span class="string">,</span><span class="comment">bus=virtio</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">accelerate</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">cdrom</span> <span class="comment">/data/iso/oel63x64</span><span class="string">.</span><span class="comment">iso</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnc</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vncport=5911</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnclisten=0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">network</span> <span class="comment">bridge=br0</span><span class="string">,</span><span class="comment">model=virtio</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">noautoconsole</span></div></pre></td></tr></table></figure>
+
+
+<p>实验环境磁盘改为virtio驱动下的vda磁盘,这种scsi磁盘可以热插拨,可以动态添加。</p>
+<h3 id="查看test虚拟机的现有磁盘">查看test虚拟机的现有磁盘</h3>
+<pre><code>virsh  domblklist <span class="keyword">test</span>
+</code></pre><h3 id="创建一块qcow2虚拟盘">创建一块qcow2虚拟盘</h3>
+<pre><code>qemu-img create <span class="operator">-f</span> qcow2 test02_add01.qcow2 <span class="number">4</span>G
+</code></pre><h3 id="在线添加这台qcow2虚拟磁盘">在线添加这台qcow2虚拟磁盘</h3>
+<pre><code><span class="title">virsh</span> attach-disk oeltest02 /<span class="typedef"><span class="keyword">data</span>/test02_add01.qcow2 vdb <span class="comment">--cache=none --subdriver=qcow2</span></span>
+</code></pre><h3 id="进入oeltest02虚拟机查看添加磁盘情况">进入oeltest02虚拟机查看添加磁盘情况</h3>
+<pre><code>fdisk <span class="operator">-l</span>可以看到刚才添加的磁盘已经被虚拟机识别到了，虚拟机可以直接在线识别
+</code></pre><p>可以查看两个scsi存储设备</p>
+<p><strong>lspci</strong></p>
+<pre><code><span class="title">RAM</span> memory:
+SCSI storage controller
+</code></pre><h3 id="修改虚拟机配置文件添加新增磁盘配置">修改虚拟机配置文件添加新增磁盘配置</h3>
+<p><strong>virsh edit test</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">disk</span> <span class="attribute">type</span>=<span class="value">'file'</span> <span class="attribute">device</span>=<span class="value">'disk'</span>&gt;</span>       </div><div class="line">  <span class="tag">&lt;<span class="title">driver</span> <span class="attribute">name</span>=<span class="value">'qemu'</span> <span class="attribute">type</span>=<span class="value">'qcow2'</span> <span class="attribute">cache</span>=<span class="value">'none'</span>/&gt;</span>        </div><div class="line">  <span class="tag">&lt;<span class="title">source</span> <span class="attribute">file</span>=<span class="value">'/data/test02_add01.qcow2'</span>/&gt;</span>        </div><div class="line">  <span class="tag">&lt;<span class="title">target</span> <span class="attribute">dev</span>=<span class="value">'vdb'</span> <span class="attribute">bus</span>=<span class="value">'virtio'</span>/&gt;</span>        </div><div class="line">  <span class="tag">&lt;<span class="title">alias</span> <span class="attribute">name</span>=<span class="value">'virtio-disk1'</span>/&gt;</span>        </div><div class="line">  <span class="tag">&lt;<span class="title">address</span> <span class="attribute">type</span>=<span class="value">'pci'</span> <span class="attribute">domain</span>=<span class="value">'0x0000'</span> <span class="attribute">bus</span>=<span class="value">'0x00'</span> <span class="attribute">slot</span>=<span class="value">'0x06'</span> <span class="attribute">function</span>=<span class="value">'0x0'</span>/&gt;</span>        </div><div class="line"><span class="tag">&lt;/<span class="title">disk</span>&gt;</span></div></pre></td></tr></table></figure>
+
+<h2 id="在虚拟机外操作虚拟机里面的内容">在虚拟机外操作虚拟机里面的内容</h2>
+<p>首先必须安装libguestfs-tools工具，如果没有安装，直接使用Yum进行安装</p>
+<h3 id="格式">格式</h3>
+<pre><code>virt-df [--options] <span class="operator">-d</span>  domname
+virt-df [--options] <span class="operator">-d</span> disk.img [<span class="operator">-a</span> disk.img]
+</code></pre><p>通常两种方式：-d采用域名称方式，-a是直接获取的磁盘文件方式</p>
+<h3 id="常用命令">常用命令</h3>
+<h3 id="virt-cat_查看虚拟机中的文件">virt-cat 查看虚拟机中的文件</h3>
+<pre><code>virt-cat <span class="operator">-d</span> test /etc/passwd <span class="comment">#查看passwd文件</span>
+</code></pre><h3 id="virt-edit_直接编辑虚拟机里面的文件，类似于vi(虚拟机需要处在关机状态)">virt-edit 直接编辑虚拟机里面的文件，类似于vi(虚拟机需要处在关机状态)</h3>
+<h3 id="virt-df_查看虚拟机磁盘使用情况">virt-df 查看虚拟机磁盘使用情况</h3>
+<pre><code>virt-df -h <span class="keyword">test</span>(使用df -h)
+</code></pre><h3 id="virt-copy-out">virt-copy-out</h3>
+<p>直接复制虚拟机里面的磁盘文件到本地磁盘上，类似cp</p>
+<pre><code>virt-<span class="keyword">copy</span>-out -d test <span class="regexp">/etc/</span>password <span class="regexp">/root(拷贝虚拟机中的password文件到/</span>root目录)
+</code></pre><h3 id="通过直接读磁盘文件中的内容">通过直接读磁盘文件中的内容</h3>
+<pre><code>virt-<span class="keyword">copy</span>-out -a <span class="regexp">/data/</span>test01.qcow2 -a <span class="regexp">/data/</span>test01_add01.qcow2 <span class="regexp">/etc/</span>sysconfig<span class="regexp">/network-scripts/i</span>fcfg-eth0 <span class="regexp">/root/</span>
+</code></pre><h3 id="virt-copy-in命令，复制虚拟平台上本地磁盘文件到虚拟机磁盘上">virt-copy-in命令，复制虚拟平台上本地磁盘文件到虚拟机磁盘上</h3>
+<p>拷贝本地/root/etc.tar.gz文件到虚拟机/root目录下</p>
+<pre><code>virt-copy-<span class="keyword">in</span> -d <span class="keyword">test</span> /root/etc.tar.gz /root
+</code></pre><h2 id="虚拟机的静态迁移">虚拟机的静态迁移</h2>
+<p>静态迁移就是虚拟机在关机状态下，拷贝虚拟机虚拟磁盘文件与配置文件到目标虚拟主机中，实现的迁移。</p>
+<ul>
+<li>虚拟主机各自使用本地存储存放虚拟机磁盘文件（本文实现基于本地磁盘存储虚拟机磁盘文件的迁移方式，）</li>
+<li>虚拟主机之间使用共享存储存放虚拟机磁盘文件（该方式只是在目标虚拟主机上重新定义虚拟机就可以了。）</li>
+</ul>
+<h3 id="静态迁移的过程">静态迁移的过程</h3>
+<h4 id="确定虚拟机处于关闭状态">确定虚拟机处于关闭状态</h4>
+<h4 id="准备迁移虚拟机，查看虚拟机磁盘文件">准备迁移虚拟机，查看虚拟机磁盘文件</h4>
+<pre><code>virsh domblklist <span class="keyword">test</span>
+</code></pre><h4 id="导出虚拟机配置文件">导出虚拟机配置文件</h4>
+<pre><code>virsh dumpxml test &gt;<span class="regexp">/root/test</span>1.xml
+</code></pre><h4 id="拷贝配置文件到目标虚拟机主机上">拷贝配置文件到目标虚拟机主机上</h4>
+<pre><code>scp <span class="regexp">/root/</span>test1.xml  dest
+</code></pre><h4 id="拷贝虚拟机磁盘文件到目标虚拟主机">拷贝虚拟机磁盘文件到目标虚拟主机</h4>
+<pre><code>scp <span class="keyword">test</span>.qcow dest
+</code></pre><h4 id="在目标主机上操作">在目标主机上操作</h4>
+<p>配置文件和磁盘文件到拷贝到相应的目录</p>
+<h4 id="定义虚拟主机">定义虚拟主机</h4>
+<pre><code>virsh define <span class="regexp">/etc/</span>libvirt<span class="regexp">/qemu/</span>test1.xml
+</code></pre><h4 id="启动虚拟机-2">启动虚拟机</h4>
+<pre><code>virsh <span class="operator"><span class="keyword">start</span> test1</span>
+</code></pre><h2 id="kvm虚拟机动态迁移">kvm虚拟机动态迁移</h2>
+<p>相比KVM虚拟机静态迁移中需要拷贝虚拟机虚拟磁盘文件，kvm虚拟机动态迁移无需拷贝虚拟磁盘文件，但是需要迁移到的虚拟主机之间需要有相同的目录结构虚拟机磁盘文件，本文这部分内容通过nfs来实现，当然也可以采用GFS2集群文件系统来实现,本文的动态迁移是基于共享存储动态迁移。</p>
+<p>KVM动态迁移目前有两种，一种是基于共享存储的动态迁移，一种是基于基于数据块的动态迁移，需要qemu-kvm-0.12.2以上版本支持，OEL6.3版本是qemu-kvm-0.12.1.2，其它发行版可能有支持。</p>
+<h3 id="环境准备">环境准备</h3>
+<h4 id="KVM虚拟化服务器node1">KVM虚拟化服务器node1</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">操作系统版本<span class="symbol">:OEL6</span>.<span class="number">3</span>x64</div><div class="line"><span class="constant">KVM</span>虚拟化<span class="symbol">:</span>自带版本</div><div class="line">桥接<span class="constant">IP</span>地址<span class="number">1</span><span class="symbol">:</span><span class="number">192.168</span>.<span class="number">159.150</span></div><div class="line">测试虚拟机<span class="symbol">:oeltest01</span></div><div class="line">虚拟机<span class="constant">IP</span>地址<span class="symbol">:</span><span class="number">192.168</span>.<span class="number">159.132</span></div><div class="line">虚拟磁盘文件<span class="number">1</span><span class="symbol">:/data/test01</span>.qcow2</div><div class="line">虚拟磁盘文件<span class="number">2</span><span class="symbol">:/data/test01_add01</span>.qcow2</div><div class="line">nfs挂载目录<span class="symbol">:/data</span></div></pre></td></tr></table></figure>
+
+<h4 id="KVM虚拟化服务器node2">KVM虚拟化服务器node2</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">操作系统版本<span class="symbol">:OEL6</span>.<span class="number">3</span>x64</div><div class="line"><span class="constant">KVM</span>虚拟化<span class="symbol">:</span>自带版本</div><div class="line">桥接<span class="constant">IP</span>地址<span class="number">1</span><span class="symbol">:</span><span class="number">192.168</span>.<span class="number">159.160</span></div><div class="line">nfs挂载目录<span class="symbol">:/data</span></div></pre></td></tr></table></figure>
+
+<h4 id="nfs服务器（nfs配置略）">nfs服务器（nfs配置略）</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">操作系统版本:OEL5.<span class="number">8</span>x64</div><div class="line">桥接IP地址<span class="number">1</span>:<span class="number">192.168</span>.<span class="number">169.180</span></div><div class="line">nfs服务目录：<span class="regexp">/mnt/</span>vg<span class="regexp">/nfs/</span>abc</div></pre></td></tr></table></figure>
+
+<h3 id="节点1和节点2都挂在nfs目录">节点1和节点2都挂在nfs目录</h3>
+<pre><code>mount -t nfs <span class="number">192.168</span>.<span class="number">159.180</span><span class="symbol">:/mnt/vg/nfs/abc</span> /data -o rw,rsize=<span class="number">32768</span>,wsize=<span class="number">32768</span> 
+</code></pre><p>确保两节点都有相同的虚拟机磁盘文件存储目录。</p>
+<h3 id="节点1处于，test1虚拟机开机状态，节点2虚拟机状态，无虚拟机运行">节点1处于，test1虚拟机开机状态，节点2虚拟机状态，无虚拟机运行</h3>
+<h3 id="在节点1上执行迁移命令">在节点1上执行迁移命令</h3>
+<pre><code><span class="comment">virsh</span> <span class="comment">migrate</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">live</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">verbose</span> <span class="comment">oeltest01</span>  <span class="comment">qemu</span><span class="literal">+</span><span class="comment">ssh://192</span><span class="string">.</span><span class="comment">168</span><span class="string">.</span><span class="comment">159</span><span class="string">.</span><span class="comment">160/system</span> <span class="comment">tcp://192</span><span class="string">.</span><span class="comment">168</span><span class="string">.</span><span class="comment">159</span><span class="string">.</span><span class="comment">160</span>
+</code></pre><p>过程有一个暂停与关闭的过程。</p>
+<h3 id="在虚拟机主机2上可以看到test1虚拟机启动了">在虚拟机主机2上可以看到test1虚拟机启动了</h3>
+<p>虽然test1虚拟机已经在节点2上启动了，但是虚拟主机上还没有test1虚拟机的配置文件。所以需要创建配置文件并定义虚拟机。</p>
+<h4 id="虚拟主机2上,通过迁移过来的虚拟机内存状态创建虚拟机配置文件，并通过xml配置文件定义虚拟机。">虚拟主机2上,通过迁移过来的虚拟机内存状态创建虚拟机配置文件，并通过xml配置文件定义虚拟机。</h4>
+<pre><code>virsh dumpxml test1 &gt;<span class="regexp">/etc/</span>libvirt<span class="regexp">/qemu/</span>test1.xml
+virsh define <span class="regexp">/etc/</span>libvirt<span class="regexp">/qemu/</span>test1.xml
+</code></pre><p>到此，kvm虚拟机动态迁移成功。</p>
+<h2 id="创建文件池">创建文件池</h2>
+<h3 id="创建基于文件夹的存储池（目录）">创建基于文件夹的存储池（目录）</h3>
+<pre><code><span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/vmfs</span>
+</code></pre><h3 id="定义存储池与其目录">定义存储池与其目录</h3>
+<pre><code>virsh pool-define-<span class="keyword">as</span> vmdisk --<span class="class"><span class="keyword">type</span> <span class="title">dir</span> --<span class="title">target</span> /<span class="title">data</span>/<span class="title">vmfs</span></span>
+</code></pre><h3 id="创建已定义的存储池">创建已定义的存储池</h3>
+<h4 id="创建已定义的存储池-1">创建已定义的存储池</h4>
+<pre><code> <span class="title">virsh</span> pool-build vmdisk
+</code></pre><h4 id="查看已定义的存储池，存储池不激活无法使用。">查看已定义的存储池，存储池不激活无法使用。</h4>
+<pre><code>virsh pool-<span class="keyword">list</span> --<span class="keyword">all</span>
+</code></pre><h3 id="激活并自动启动已定义的存储池">激活并自动启动已定义的存储池</h3>
+<pre><code><span class="preprocessor"># virsh pool-autostart vmdisk</span>
+<span class="preprocessor"># virsh pool-start vmdisk</span>
+</code></pre><p>这里vmdisk存储池就已经创建好了，可以直接在这个存储池中创建虚拟磁盘文件了。</p>
+<h3 id="在存储池中创建虚拟机存储卷">在存储池中创建虚拟机存储卷</h3>
+<h4 id="在存储池中创建虚拟机存储卷-1">在存储池中创建虚拟机存储卷</h4>
+<pre><code>virsh vol-<span class="operator"><span class="keyword">create</span>-<span class="keyword">as</span> vmdisk oeltest03.qcow2 <span class="number">20</span>G <span class="comment">--format qcow2</span></span>
+</code></pre><h4 id="根据创建的虚拟机存储卷安装虚拟机">根据创建的虚拟机存储卷安装虚拟机</h4>
+<pre><code><span class="comment">virt</span><span class="literal">-</span><span class="comment">install</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">name=oeltest03</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">os</span><span class="literal">-</span><span class="comment">variant=RHEL6</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">ram</span> <span class="comment">1024</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vcpus=1</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">disk</span> <span class="comment">path=/data/oeltest03</span><span class="string">.</span><span class="comment">qcow2</span><span class="string">,</span><span class="comment">format=qcow2</span><span class="string">,</span><span class="comment">size=20</span><span class="string">,</span><span class="comment">bus=virtio</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">accelerate</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">cdrom</span> <span class="comment">/data/iso/oel63x64</span><span class="string">.</span><span class="comment">iso</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnc</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vncport=5910</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">vnclisten=0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span><span class="string">.</span><span class="comment">0</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">network</span> <span class="comment">bridge=br0</span><span class="string">,</span><span class="comment">model=virtio</span> <span class="comment">–noautoconsole</span>
+</code></pre><ul>
+<li>KVM存储池主要是体现一种管理方式，可以通过挂载存储目录，lvm逻辑卷的方式创建存储池，虚拟机存储卷创建完成后，剩下的操作与无存储卷的方式无任何区别了。</li>
+<li>KVM存储池也要用于虚拟机迁移任务。</li>
+</ul>
+<h3 id="存储池相关管理命令">存储池相关管理命令</h3>
+<h4 id="在存储池中删除虚拟机存储卷">在存储池中删除虚拟机存储卷</h4>
+<pre><code>virsh vol-<span class="operator"><span class="keyword">delete</span> <span class="comment">--pool vmdisk oeltest03.qcow2</span></span>
+</code></pre><h4 id="取消激活存储池">取消激活存储池</h4>
+<pre><code><span class="title">virsh</span> pool-destroy vmdisk
+</code></pre><h4 id="删除存储池定义的目录/data/vmfs">删除存储池定义的目录/data/vmfs</h4>
+<pre><code>virsh pool-<span class="built_in">delete</span> vmdisk
+</code></pre><h4 id="取消定义存储池">取消定义存储池</h4>
+<pre><code> <span class="title">virsh</span> pool-undefine vmdisk        
+</code></pre><p>到此kvm存储池配置与管理操作完毕。</p>
+<h2 id="kvm静态迁移工具v2v">kvm静态迁移工具v2v</h2>
+<p>v2v的迁移需要kvm的存储池的支持。</p>
+<h3 id="源虚拟机KVM存储池配置">源虚拟机KVM存储池配置</h3>
+<pre><code><span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/vmfs</span>
+<span class="title">virsh</span> pool-define-<span class="keyword">as</span> vmdisk <span class="comment">--type dir --target /data/vmfs</span>
+<span class="title">virsh</span> pool-build vmdisk
+<span class="title">virsh</span> pool-autostart vmdisk
+<span class="title">virsh</span> pool-start vmdisk
+</code></pre><h3 id="将虚拟机磁盘文件移动到存储池中">将虚拟机磁盘文件移动到存储池中</h3>
+<pre><code><span class="title">mv</span> /<span class="typedef"><span class="keyword">data</span>/oeltest01.qcow2 /<span class="keyword">data</span>/vmfs/</span>
+</code></pre><h3 id="目标虚拟机KVM存储池配置简要过程">目标虚拟机KVM存储池配置简要过程</h3>
+<pre><code><span class="title">mkdir</span> -p /<span class="typedef"><span class="keyword">data</span>/vmfs</span>
+<span class="title">virsh</span> pool-define-<span class="keyword">as</span> vmdisk <span class="comment">--type dir --target /data/vmfs</span>
+<span class="title">virsh</span> pool-build vmdisk
+<span class="title">virsh</span> pool-autostart vmdisk
+<span class="title">virsh</span> pool-start vmdisk
+</code></pre><h3 id="迁移">迁移</h3>
+<blockquote>
+<p>计划将源kvm主机中的oeltest01虚拟机迁移到目标虚拟机中，原理是直接拷贝虚拟机磁盘文件与配置文件到目标虚拟主机上。关键点就是源与目标虚拟主机必须采用存储池配置虚拟机磁盘。</p>
+</blockquote>
+<pre><code>virt-v2v -ic qemu+ssh:<span class="comment">//192.168.233.130/system -op vmdisk -b br0 oeltest01</span>
+</code></pre><p>迁移完后，可以到磁盘上去查看</p>
+<pre><code>virsh <span class="keyword">list</span> --<span class="keyword">all</span>
+<span class="keyword">cd</span>/ etc/libvirt/qemu
+<span class="keyword">ll</span> -<span class="keyword">h</span> /data/vmfs
+</code></pre><p>至此KVM到KVM之v2v迁移成功完成。v2v的迁移方式也是其它静态迁移方式的补充，也让kvm虚拟化适用范围扩大。    </p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/虚拟机/">虚拟机</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/虚拟机/">虚拟机</a>, <a href="/tags/kvm/">kvm</a>
+  </div>
+
+	
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    
+    <a href="/2014/11/01/hexo博客系统/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<section id="comment">
+<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yangcan"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:www.yangcan.me">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/cache/">cache</a><small>1</small></li>
+  
+    <li><a href="/categories/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/categories/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/categories/mac/">mac</a><small>1</small></li>
+  
+    <li><a href="/categories/news/">news</a><small>0</small></li>
+  
+    <li><a href="/categories/php/">php</a><small>2</small></li>
+  
+    <li><a href="/categories/命令/">命令</a><small>2</small></li>
+  
+    <li><a href="/categories/生活/">生活</a><small>1</small></li>
+  
+    <li><a href="/categories/虚拟机/">虚拟机</a><small>1</small></li>
+  
+    <li><a href="/categories/面试题/">面试题</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/cmd/">cmd</a><small>1</small></li>
+  
+    <li><a href="/tags/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/tags/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/kvm/">kvm</a><small>1</small></li>
+  
+    <li><a href="/tags/mongo/">mongo</a><small>2</small></li>
+  
+    <li><a href="/tags/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/tags/news/">news</a><small>0</small></li>
+  
+    <li><a href="/tags/nginx/">nginx</a><small>1</small></li>
+  
+    <li><a href="/tags/php/">php</a><small>3</small></li>
+  
+    <li><a href="/tags/redis/">redis</a><small>1</small></li>
+  
+    <li><a href="/tags/website/">website</a><small>1</small></li>
+  
+    <li><a href="/tags/wget/">wget</a><small>1</small></li>
+  
+    <li><a href="/tags/网址/">网址</a><small>0</small></li>
+  
+    <li><a href="/tags/虚拟机/">虚拟机</a><small>2</small></li>
+  
+    <li><a href="/tags/运维/">运维</a><small>1</small></li>
+  
+    <li><a href="/tags/面试/">面试</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/cmd/" style="font-size: 13.33px;">cmd</a><a href="/tags/docker/" style="font-size: 13.33px;">docker</a><a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a><a href="/tags/kvm/" style="font-size: 13.33px;">kvm</a><a href="/tags/mongo/" style="font-size: 16.67px;">mongo</a><a href="/tags/mysql/" style="font-size: 13.33px;">mysql</a><a href="/tags/news/" style="font-size: 10.00px;">news</a><a href="/tags/nginx/" style="font-size: 13.33px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/redis/" style="font-size: 13.33px;">redis</a><a href="/tags/website/" style="font-size: 13.33px;">website</a><a href="/tags/wget/" style="font-size: 13.33px;">wget</a><a href="/tags/网址/" style="font-size: 10.00px;">网址</a><a href="/tags/虚拟机/" style="font-size: 16.67px;">虚拟机</a><a href="/tags/运维/" style="font-size: 13.33px;">运维</a><a href="/tags/面试/" style="font-size: 13.33px;">面试</a>
+  </div>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=3254648682&verifier=c306487b&dpc=1"></iframe>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+<li><a href="http://zipperary.com/" title="Zippera's Blog">Zippera</a></li>
+</ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2014 snom
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff501752a59d5d204ac71a701b1bd2050' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+</body>
+</html>
