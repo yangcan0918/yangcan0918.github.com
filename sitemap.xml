@@ -2,6 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.yangcan.me/2014/11/01/mongodb%E5%9C%A8centos%E4%B8%8A%E7%9A%84%E5%AE%89%E8%A3%85/</loc>
+    <lastmod>2014-11-04T08:54:44.000Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.yangcan.me/2014/11/04/pic/</loc>
+    <lastmod>2014-11-04T06:21:12.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.yangcan.me/2014/11/04/%E5%85%A8%E5%9B%BD%E8%91%97%E5%90%8D%E7%9A%84%E5%85%AC%E5%BC%80%E7%9A%84DNS%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%99%A8%E5%9C%B0%E5%9D%80/</loc>
     <lastmod>2014-11-04T06:07:46.000Z</lastmod>
   </url>
@@ -49,11 +59,6 @@
   <url>
     <loc>http://www.yangcan.me/2014/11/01/php%E5%AE%89%E8%A3%85mongo%E7%9A%84%E6%89%A9%E5%B1%95/</loc>
     <lastmod>2014-11-01T07:59:49.000Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://www.yangcan.me/2014/11/01/mongodb%E5%9C%A8centos%E4%B8%8A%E7%9A%84%E5%AE%89%E8%A3%85/</loc>
-    <lastmod>2014-11-01T07:58:44.000Z</lastmod>
   </url>
   
   <url>
