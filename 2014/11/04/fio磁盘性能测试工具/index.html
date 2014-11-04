@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>test | linux运维学习与交流中心</title>
+  <title>fio磁盘性能测试工具 | linux运维学习与交流中心</title>
   <meta name="author" content="snom">
   
   <meta name="description" content="本博客主要用来记录linux相关的文章">
@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="test"/>
+  <meta property="og:title" content="fio磁盘性能测试工具"/>
   <meta property="og:site_name" content="linux运维学习与交流中心"/>
 
   
@@ -52,26 +52,81 @@
 <div class="clearfix"></div>
 </header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper"><article class="page">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
   
   <div class="post-content">
     <header>
       
+        <div class="icon"></div>
+        <time datetime="2014-11-04T00:55:06.000Z"><a href="/2014/11/04/fio磁盘性能测试工具/">11月 4 2014</a></time>
+      
       
   
-    <h1 class="title">test</h1>
+    <h1 class="title">fio磁盘性能测试工具</h1>
   
 
     </header>
     <div class="entry">
       
-        
+        <p>磁盘IO是检查磁盘性能的重要指标，可以按照负载情况分成照顺序读写，随机读写两大类。<br>准备环境：创建一个2G文件</p>
+<pre><code>dd <span class="variable">if=</span>/dev/zero  <span class="variable">of=</span>/root/test <span class="variable">bs=</span><span class="number">4</span><span class="variable">kcount=</span><span class="number">524288</span>
+</code></pre><a id="more"></a>
+
+<h3 id="测试顺序读性能">测试顺序读性能</h3>
+<pre><code>fio <span class="variable">--filename=</span>/root/test <span class="variable">-iodepth=</span><span class="number">64</span> <span class="variable">-ioengine=</span>libaio <span class="variable">--direct=</span><span class="number">1</span> <span class="variable">--rw=</span>read <span class="variable">--bs=</span><span class="number">1</span>m <span class="variable">--size=</span><span class="number">2</span>g <span class="variable">--numjobs=</span><span class="number">4</span> <span class="variable">--runtime=</span><span class="number">10</span> --group_reporting <span class="variable">--name=</span>test-read
+</code></pre><h3 id="测试顺序写性能">测试顺序写性能</h3>
+<pre><code>fio <span class="variable">-filename=</span>/root/test <span class="variable">-iodepth=</span><span class="number">64</span> <span class="variable">-ioengine=</span>libaio <span class="variable">-direct=</span><span class="number">1</span> <span class="variable">-rw=</span>write <span class="variable">-bs=</span><span class="number">1</span>m <span class="variable">-size=</span><span class="number">2</span>g <span class="variable">-numjobs=</span><span class="number">4</span> <span class="variable">-runtime=</span><span class="number">20</span> -group_reporting <span class="variable">-name=</span>test-write
+</code></pre><h3 id="测试随机读性能">测试随机读性能</h3>
+<pre><code>fio <span class="variable">-filename=</span>/root/test <span class="variable">-iodepth=</span><span class="number">64</span> <span class="variable">-ioengine=</span>libaio <span class="variable">-direct=</span><span class="number">1</span> <span class="variable">-rw=</span>randread <span class="variable">-bs=</span><span class="number">4</span>k <span class="variable">-size=</span><span class="number">2</span>G <span class="variable">-numjobs=</span><span class="number">64</span> <span class="variable">-runtime=</span><span class="number">20</span> -group_reporting <span class="variable">-name=</span>test-rand-read
+</code></pre><h3 id="测试随机写性能">测试随机写性能</h3>
+<pre><code>fio <span class="variable">-filename=</span>/root/test <span class="variable">-iodepth=</span><span class="number">64</span> <span class="variable">-ioengine=</span><span class="variable">libaio-direct=</span><span class="number">1</span> <span class="variable">-rw=</span>randwrite <span class="variable">-bs=</span><span class="number">4</span>k <span class="variable">-size=</span><span class="number">2</span>G <span class="variable">-numjobs=</span><span class="number">64</span> <span class="variable">-runtime=</span><span class="number">20</span>-group_reporting <span class="variable">-name=</span>test-rand-write
+</code></pre><h2 id="选项详解">选项详解</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="variable">filename=</span>/root/test 测试文件名称，通常选择需要测试的盘的data目录。</div><div class="line"><span class="variable">direct=</span><span class="number">1</span> 测试过程绕过机器自带的buffer。使测试结果更真实。</div><div class="line"><span class="variable">rw=</span>randwrite 测试随机写的I/O</div><div class="line"><span class="variable">rw=</span>randrw 测试随机写和读的I/O</div><div class="line"><span class="variable">bs=</span><span class="number">4</span>k 单次io的块文件大小为<span class="number">4</span>k</div><div class="line"><span class="variable">size=</span><span class="number">2</span>g 本次的测试文件大小为<span class="number">2</span>g，以每次<span class="number">4</span>k的io进行测试。</div><div class="line"><span class="variable">numjobs=</span><span class="number">64</span> 本次的测试线程为<span class="number">64</span>.</div><div class="line"><span class="variable">runtime=</span><span class="number">20</span> 测试时间为<span class="number">20</span>秒，如果不写则一直将<span class="number">2</span>g文件分<span class="number">4</span>k每次写完为止。</div></pre></td></tr></table></figure>
+
+<h2 id="报告如何查看：">报告如何查看：</h2>
+<p>fio的结果报告内容丰富，我们主要关心的是两项：</p>
+<ul>
+<li>磁盘的吞吐量bw，这个是顺序读写考察的重点</li>
+<li>磁盘的每秒读写次数iops，这个是随机读写考察的重点</li>
+</ul>
+<p>比如，下面是4个测试的结果部分截取：</p>
+<pre><code>test-read:(<span class="variable">groupid=</span><span class="number">0</span>, <span class="variable">jobs=</span><span class="number">4</span>): <span class="variable">err=</span> <span class="number">0</span>: <span class="variable">pid=</span><span class="number">4752</span>
+read : <span class="variable">io=</span><span class="number">839680</span>KB, <span class="variable">bw=</span><span class="number">76823</span>KB/s, <span class="variable">iops=</span><span class="number">75</span> , <span class="variable">runt=</span> <span class="number">10930</span>msec
+</code></pre><blockquote>
+<p>顺序读，带宽76823KB/s，iops 75</p>
+</blockquote>
+<pre><code>test-write:(<span class="variable">groupid=</span><span class="number">0</span>, <span class="variable">jobs=</span><span class="number">4</span>): <span class="variable">err=</span> <span class="number">0</span>: <span class="variable">pid=</span><span class="number">4758</span>
+write: <span class="variable">io=</span><span class="number">899072</span>KB, <span class="variable">bw=</span><span class="number">42854</span>KB/s, <span class="variable">iops=</span><span class="number">41</span> , <span class="variable">runt=</span> <span class="number">20980</span>msec
+</code></pre><blockquote>
+<p>顺序写，带宽42854KB/s, iops=41</p>
+</blockquote>
+<pre><code>test-rand-read:(<span class="variable">groupid=</span><span class="number">0</span>, <span class="variable">jobs=</span><span class="number">64</span>): <span class="variable">err=</span> <span class="number">0</span>: <span class="variable">pid=</span><span class="number">4619</span>
+read : <span class="variable">io=</span><span class="number">72556</span>KB, <span class="variable">bw=</span><span class="number">3457.4</span>KB/s, <span class="variable">iops=</span><span class="number">864</span> , <span class="variable">runt=</span> <span class="number">20986</span>msec
+</code></pre><blockquote>
+<p>随机读，带宽3457.4KB/s, iops=864</p>
+</blockquote>
+<pre><code>test-rand-write:(<span class="variable">groupid=</span><span class="number">0</span>, <span class="variable">jobs=</span><span class="number">64</span>): <span class="variable">err=</span> <span class="number">0</span>: <span class="variable">pid=</span><span class="number">4685</span>
+write: <span class="variable">io=</span><span class="number">129264</span>KB, <span class="variable">bw=</span><span class="number">6432.4</span>KB/s, <span class="variable">iops=</span><span class="number">1608</span> , <span class="variable">runt=</span> <span class="number">20097</span>msec
+</code></pre><blockquote>
+<p>随机写，带宽6432.4KB/s, iops=1608</p>
+</blockquote>
+
       
     </div>
     <footer>
       
         
+  
+  <div class="categories">
+    <a href="/categories/测试工具/">测试工具</a>
+  </div>
+
         
+  
+  <div class="tags">
+    <a href="/tags/磁盘/">磁盘</a>, <a href="/tags/工具/">工具</a>
+  </div>
+
 	
 <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
 <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
@@ -86,6 +141,8 @@
 
  <nav id="pagination" >
     
+    
+    <a href="/2014/11/03/kvm虚拟机系统学习/" class="alignright next" >下一页</a>
     
     <div class="clearfix"></div>
 </nav>

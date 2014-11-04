@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>虚拟机 | linux运维学习与交流中心</title>
+  <title>测试工具 | linux运维学习与交流中心</title>
   <meta name="author" content="snom">
   
   <meta name="description" content="本博客主要用来记录linux相关的文章">
@@ -53,7 +53,7 @@
 </header>
   <div id="content" class="inner">
     <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title category">虚拟机</h2>
+<h2 class="archive-title category">测试工具</h2>
 
 
   
@@ -63,27 +63,26 @@
     <header>
       
         <div class="icon"></div>
-        <time datetime="2014-11-03T13:41:50.000Z"><a href="/2014/11/03/kvm虚拟机系统学习/">11月 3 2014</a></time>
+        <time datetime="2014-11-04T00:55:06.000Z"><a href="/2014/11/04/fio磁盘性能测试工具/">11月 4 2014</a></time>
       
       
   
-    <h1 class="title"><a href="/2014/11/03/kvm虚拟机系统学习/">kvm虚拟机系统学习</a></h1>
+    <h1 class="title"><a href="/2014/11/04/fio磁盘性能测试工具/">fio磁盘性能测试工具</a></h1>
   
 
     </header>
     <div class="entry">
       
-        <h2 id="kvm环境部署(以centos6-4机器搭建)">kvm环境部署(以centos6.4机器搭建)</h2>
-<h3 id="查看系统是否支持虚拟化">查看系统是否支持虚拟化</h3>
-<pre><code>egrep '(vmx|svm)' --color=always /<span class="keyword">proc</span>/cpuinfo
-</code></pre><p>
+        <p>磁盘IO是检查磁盘性能的重要指标，可以按照负载情况分成照顺序读写，随机读写两大类。<br>准备环境：创建一个2G文件</p>
+<pre><code>dd <span class="variable">if=</span>/dev/zero  <span class="variable">of=</span>/root/test <span class="variable">bs=</span><span class="number">4</span><span class="variable">kcount=</span><span class="number">524288</span>
+</code></pre>
       
     </div>
     <footer>
       
         
           <div class="alignleft">
-            <a href="/2014/11/03/kvm虚拟机系统学习/#more" class="more-link">阅读全文</a>
+            <a href="/2014/11/04/fio磁盘性能测试工具/#more" class="more-link">阅读全文</a>
           </div>
         
         
