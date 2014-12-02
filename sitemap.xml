@@ -2,6 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.yangcan.me/about/meinv-photo.html</loc>
+    <lastmod>2014-12-02T09:03:56.000Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.yangcan.me/about/index.html</loc>
+    <lastmod>2014-12-02T09:03:36.000Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://www.yangcan.me/2014/12/02/meinv-photo/</loc>
     <lastmod>2014-12-02T08:57:48.000Z</lastmod>
   </url>
@@ -39,11 +49,6 @@
   <url>
     <loc>http://www.yangcan.me/2014/11/01/hexo%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/</loc>
     <lastmod>2014-11-01T11:32:46.000Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://www.yangcan.me/about/index.html</loc>
-    <lastmod>2014-11-01T08:42:44.000Z</lastmod>
   </url>
   
   <url>
