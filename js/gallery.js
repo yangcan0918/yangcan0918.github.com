@@ -24,8 +24,8 @@
         nHeight = _this.naturalHeight;
 
       callback();
-      this.animate({opacity: 1}, 500);
-      parent.animate({height: width * nHeight / nWidth}, 500);
+      this.animate({opacity: 1}, 400);
+      parent.animate({height: width * nHeight / nWidth}, 400);
     });
   };
 
@@ -46,7 +46,7 @@
         loading = true;
 
         play($this, photoset.eq(next), function(){
-          photoset.eq(current).animate({opacity: 0}, 500);
+          photoset.eq(current).animate({opacity: 0}, 400);
           loading = false;
           current = next;
         });
@@ -57,7 +57,7 @@
         loading = true;
 
         play($this, photoset.eq(next), function(){
-          photoset.eq(current).animate({opacity: 0}, 500);
+          photoset.eq(current).animate({opacity: 0}, 400);
           loading = false;
           current = next;
         });
