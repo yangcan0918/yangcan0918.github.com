@@ -1,0 +1,18 @@
+<html>
+<head>
+<title>libdd.com</title>
+</head>
+<frameset framespacing='0' border='false' frameborder='0' rows='100%,*'>
+<frame name='main' src='helper.php' frameborder=0 scrolling=auto noresize>
+<frame name='sub1' src='/pku137/counternew.html' frameborder=0 scrolling=auto noresize>
+<noframes>
+	<body>
+	Click here for <a href="helper.php">libdd.com</a><hr>
+	<P>
+	</body>
+</noframes>
+</frameset>
+</html>
+
+
+

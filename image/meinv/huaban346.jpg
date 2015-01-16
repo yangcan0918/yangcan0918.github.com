@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="language" content="en" />
+
+	<!-- blueprint CSS framework -->
+	<link rel="stylesheet" type="text/css" href="/css/css/screen.css" media="screen, projection" />
+	<link rel="stylesheet" type="text/css" href="/css/css//print.css" media="print" />
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="/css/css/ie.css" media="screen, projection" />
+	<![endif]-->
+
+	<link rel="stylesheet" type="text/css" href="/css/css/main.css" />
+	
+	<script type="text/javascript" src="/assets/8ebe18dc/jquery.js"></script>
+<script type="text/javascript" src="/scripts/utility.js"></script>
+<script type="text/javascript" src="/scripts/simpleImgCutter.js"></script>
+<script type="text/javascript" src="/scripts/jquery.customSelect.min.js"></script>
+<title>ARPLIFY AR广告投放平台 - Error</title>
+</head>
+
+<body>
+
+<div class="container" id="page">
+
+	<div id="header">
+		<div class="bgimage"></div>
+		<div class="topbanner">
+			<a class="arLogo" href="/"></a>
+			<ul>
+							<li>
+					<a class="tools" href="/">你的广告活动</a>
+					<div class="addnew"><a href="/product/create"></a></div>
+				</li>
+				<li>
+					<a class="tools" href="/productgroup">你的应用</a>
+					<div class="addnew"><a href="/productgroup/create"></a></div>
+				</li>
+				<li>
+					<a class="tools full_rounded">使用说明</a>
+				</li>
+						</ul>
+			<div class="userdropdown">
+			
+			<div id="usermenu">
+				<ul>
+					<li><a class="menulink" href="/member/profile">您的帐户</a></li>
+					<li><a class="menulink" href="/logout">登出</a></li>
+				</ul>
+			</div>
+			
+			<a class="menulink user" href="#">
+				<span class="usericon"></span>
+							</a>
+			</div>
+		</div>
+	</div><!-- header -->
+	<!-- breadcrumbs -->
+
+	<div id="content">
+	
+<h2>错误 404</h2>
+
+<div class="error">
+无法解析请求 &quot;images/userup/1111/511111071442211.jpg&quot;。</div></div><!-- content -->
+
+	<div class="clear"></div>
+
+	<div id="footer">
+		ARplify.com Copyright &copy; 2015&nbsp;&nbsp;CRED Marketing <br/>
+		All Rights Reserved.<br/>
+		<div class="languages">
+			<form id="selectlang" action="/site/reload" method="post">	
+			语言			
+						<select name="BdkLanguages" id="BdkLanguages">
+<option value="1" selected="selected">中文简体</option>
+<option value="2">English</option>
+<option value="3">中文繁體</option>
+</select>			</form>
+		</div>
+		
+	</div><!-- footer -->
+
+</div><!-- page -->
+
+<script type="text/javascript">
+$(function(){
+	$("#BdkLanguages").change(function(){$('#selectlang').submit();});
+
+	$(".user").click(function(){$('#usermenu').toggle();});
+	$('.topbanner li').mouseenter(function(){
+		$(this).find('a.tools').addClass('tools-hover');
+		$(this).find('.addnew').css({'opacity':'1'});
+	}).mouseleave(function(){
+		$(this).find('a.tools').removeClass('tools-hover');
+		$(this).find('.addnew').css({'opacity':'0'});
+	})
+	$('.addnew').mouseenter(function(){
+		$(this).css({'box-shadow':'0 0 5px #fff'});
+	}).mouseleave(function(){
+		$(this).css({'box-shadow':'none'});
+	})
+	
+	$('#adminMenu').children('li.topline').mouseenter(function(){
+		$(this).css({'background':'#37F8FF'});
+	}).mouseleave(function(){
+		$(this).css({'background':'none'});
+	})
+	
+	$('#adminMenu li.topline ul li a').mouseenter(function(){
+		$(this).parent().parent().parent().children('a.menulink').css({'background':'#37F8FF'});
+	})
+
+	$('#adminMenu li.topline ul').mouseleave(function(){
+		$(this).parent().children('a.menulink').css({'background':'none'});
+	})
+});
+</script>
+</body>
+</html>

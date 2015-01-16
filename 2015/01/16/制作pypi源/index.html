@@ -1,0 +1,336 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>制作pypi源 | linux运维学习与交流中心</title>
+  <meta name="author" content="snom">
+  
+  <meta name="description" content="本博客主要用来记录linux相关的文章">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="制作pypi源"/>
+  <meta property="og:site_name" content="linux运维学习与交流中心"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+ <link href="/favicon.ico" rel="icon" type="image/x-ico"> 
+  <link rel="alternate" href="/atom.xml" title="linux运维学习与交流中心" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">linux运维学习与交流中心</a></h1>
+  <h2><a href="/">技术永无止境</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">存档</a></li>
+    
+      <li><a href="/美女">关于</a></li>
+    
+      <li><a href="/todolist">ToDo</a></li>
+    
+      <li><a href="/Photos">Photos</a></li>
+    
+      <li> <a href="/atom.xml">RSS</a> </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-01-16T07:32:40.000Z"><a href="/2015/01/16/制作pypi源/">1月 16 2015</a></time>
+      
+      
+  
+    <h1 class="title">制作pypi源</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>为了加快devstack脚本的安装速度，所以必须解决PYPI的本地源制作。为了长远打算，把整个python官方都mirror到本地，类似Ubuntu 12.04的源，定期同步就可以。<br>要想让Devstack几分钟装完，你必须在本地</p>
+<ul>
+<li>本地的ubuntu 12.04源</li>
+<li>本地Openstack git源</li>
+<li>本地PYPI源<br><a id="more"></a><br>搞一个本地pypi，其实就是安装python的这个包bandersnatch就可以，如果你是在Ubuntu下，那么估计就很简单，对着文档，应该就 几分钟就可以搞定。由于我的Cobbler是在Centos下，日后也打算切换到Centos下，所有就希望在Centos 下去搞定，这样就变得很复杂，因为Centos6.x的Python是2.6.6，而这个软件是必须Python 2.7。</li>
+</ul>
+<h3 id="安装开发工具">安装开发工具</h3>
+<pre><code>yum groupinstall yum <span class="operator"><span class="keyword">install</span> zlib-devel bzip2-devel openssl-devel \</span>
+</code></pre><p>ncurses-devel sqlite-devel readline-devel tk-devel</p>
+<h3 id="安装python2-7-5">安装python2.7.5</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /opt</div><div class="line">wget http:tar zxvf Python-<span class="number">2.7</span>.<span class="number">5</span>.tgz</div><div class="line"><span class="built_in">cd</span> Python-<span class="number">2.7</span>.<span class="number">5</span></div><div class="line">./configure --prefix=/usr/local</div><div class="line">make && make install</div></pre></td></tr></table></figure>
+
+<h3 id="下载和安装python2-7的库">下载和安装python2.7的库</h3>
+<p>Python的网站,很多都是通过https下载,wget无法直接使用https,懒得折腾,下载本地上传到opt目录下.<br>下载地址：<a href="https://pypi.python.org/pypi/distribute" target="_blank" rel="external">https://pypi.python.org/pypi/distribute</a></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cd</span> /<span class="keyword">opt</span></div><div class="line">unzip distribute-<span class="number">0.7</span>.<span class="number">3</span>.zip</div><div class="line"><span class="keyword">cd</span> distribute-<span class="number">0.7</span>.<span class="number">3</span></div><div class="line">python2.<span class="number">7</span> setup.<span class="keyword">py</span> install</div></pre></td></tr></table></figure>
+
+<h3 id="安装virtualenv">安装virtualenv</h3>
+<pre><code>easy_install-2.7 virtualenv
+</code></pre><h3 id="安装bandersnatch">安装bandersnatch</h3>
+<p><a href="https://pypi.python.org/pypi/bandersnatch/1.0.5" target="_blank" rel="external">https://pypi.python.org/pypi/bandersnatch/1.0.5</a></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cd</span> /<span class="keyword">opt</span></div><div class="line">virtualenv-<span class="number">2.7</span> bandersnatch</div><div class="line"><span class="keyword">cd</span> bandersnatch</div><div class="line">bin/pip install -<span class="keyword">r</span> http<span class="variable">s:</span>//bitbucket.org/ctheune/bandersnatch/raw/stable/requirements.txt</div></pre></td></tr></table></figure>
+
+<p>有可能运行出现中断和各种错误,多重复运行几次就ok.</p>
+<h3 id="设置bandersnatch">设置bandersnatch</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cd</span> /<span class="keyword">opt</span>/bandersnatch</div><div class="line">bin/bandersnatch mirror</div></pre></td></tr></table></figure>
+
+<p>会出现一个提示</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">2013<span class="tag">-07-30</span> 12<span class="pseudo">:56</span><span class="pseudo">:45</span>,925 <span class="tag">WARNING</span>: <span class="tag">Config</span> <span class="tag">file</span>  <span class="tag">missing</span>,</div><div class="line"> <span class="tag">creating</span>  <span class="tag">config</span>.</div><div class="line">2013<span class="tag">-07-30</span> 12<span class="pseudo">:56</span><span class="pseudo">:45</span>,926 <span class="tag">WARNING</span>: <span class="tag">Please</span> <span class="tag">review</span> <span class="tag">the</span> <span class="tag">config</span> <span class="tag">file</span>, </div><div class="line"><span class="tag">then</span> <span class="tag">run</span>  <span class="tag">again</span>.</div></pre></td></tr></table></figure>
+
+<p>你就编辑 /etc/bandersnatch.conf 文件就可以。默认应该就可以，我也只是修改了一下pypi存放的位置，改成在/home 目录下。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#directory = /srv/pypi</span></div><div class="line">directory = <span class="regexp">/home/pypi</span></div></pre></td></tr></table></figure>
+
+<h3 id="设置apache">设置apache</h3>
+<p>我只需要把 /home/pypi/web 目录链接到apache目录下显示就可以<br>        ln -s /home/pypi/web /var/www/html/pypi</p>
+<h3 id="设置客户端">设置客户端</h3>
+<pre><code>假设你的Pypi目录是 http:<span class="comment">//10.1.199.5/pypi</span>
+</code></pre><p>在用户主目录下，</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir <span class="variable">$HOME</span>/.pip</div><div class="line">vi <span class="variable">$HOME</span>/.pip/pip.conf</div><div class="line">[<span class="keyword">global</span>]</div><div class="line">index-url = http:<span class="comment">//10.1.199.5/pypi/simple</span></div></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/python/">python</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/pypi/">pypi</a>
+  </div>
+
+	
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    
+    <a href="/2014/11/14/chengxu/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<section id="comment">
+<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yangcan"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:www.yangcan.me">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/12306/">12306</a><small>0</small></li>
+  
+    <li><a href="/categories/DNS/">DNS</a><small>1</small></li>
+  
+    <li><a href="/categories/cache/">cache</a><small>1</small></li>
+  
+    <li><a href="/categories/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/categories/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/categories/mac/">mac</a><small>1</small></li>
+  
+    <li><a href="/categories/news/">news</a><small>0</small></li>
+  
+    <li><a href="/categories/php/">php</a><small>2</small></li>
+  
+    <li><a href="/categories/pic/">pic</a><small>1</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+    <li><a href="/categories/命令/">命令</a><small>2</small></li>
+  
+    <li><a href="/categories/文章/">文章</a><small>1</small></li>
+  
+    <li><a href="/categories/测试工具/">测试工具</a><small>1</small></li>
+  
+    <li><a href="/categories/生活/">生活</a><small>1</small></li>
+  
+    <li><a href="/categories/虚拟机/">虚拟机</a><small>1</small></li>
+  
+    <li><a href="/categories/面试题/">面试题</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/DNS/">DNS</a><small>1</small></li>
+  
+    <li><a href="/tags/cmd/">cmd</a><small>1</small></li>
+  
+    <li><a href="/tags/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/tags/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/kvm/">kvm</a><small>1</small></li>
+  
+    <li><a href="/tags/mongo/">mongo</a><small>2</small></li>
+  
+    <li><a href="/tags/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/tags/news/">news</a><small>0</small></li>
+  
+    <li><a href="/tags/nginx/">nginx</a><small>1</small></li>
+  
+    <li><a href="/tags/php/">php</a><small>3</small></li>
+  
+    <li><a href="/tags/pic/">pic</a><small>1</small></li>
+  
+    <li><a href="/tags/pypi/">pypi</a><small>1</small></li>
+  
+    <li><a href="/tags/redis/">redis</a><small>1</small></li>
+  
+    <li><a href="/tags/website/">website</a><small>1</small></li>
+  
+    <li><a href="/tags/wget/">wget</a><small>1</small></li>
+  
+    <li><a href="/tags/工具/">工具</a><small>1</small></li>
+  
+    <li><a href="/tags/文章/">文章</a><small>1</small></li>
+  
+    <li><a href="/tags/泄露信息/">泄露信息</a><small>0</small></li>
+  
+    <li><a href="/tags/磁盘/">磁盘</a><small>1</small></li>
+  
+    <li><a href="/tags/网址/">网址</a><small>0</small></li>
+  
+    <li><a href="/tags/虚拟机/">虚拟机</a><small>2</small></li>
+  
+    <li><a href="/tags/运维/">运维</a><small>1</small></li>
+  
+    <li><a href="/tags/面试/">面试</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/DNS/" style="font-size: 13.33px;">DNS</a><a href="/tags/cmd/" style="font-size: 13.33px;">cmd</a><a href="/tags/docker/" style="font-size: 13.33px;">docker</a><a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a><a href="/tags/kvm/" style="font-size: 13.33px;">kvm</a><a href="/tags/mongo/" style="font-size: 16.67px;">mongo</a><a href="/tags/mysql/" style="font-size: 13.33px;">mysql</a><a href="/tags/news/" style="font-size: 10.00px;">news</a><a href="/tags/nginx/" style="font-size: 13.33px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/pic/" style="font-size: 13.33px;">pic</a><a href="/tags/pypi/" style="font-size: 13.33px;">pypi</a><a href="/tags/redis/" style="font-size: 13.33px;">redis</a><a href="/tags/website/" style="font-size: 13.33px;">website</a><a href="/tags/wget/" style="font-size: 13.33px;">wget</a><a href="/tags/工具/" style="font-size: 13.33px;">工具</a><a href="/tags/文章/" style="font-size: 13.33px;">文章</a><a href="/tags/泄露信息/" style="font-size: 10.00px;">泄露信息</a><a href="/tags/磁盘/" style="font-size: 13.33px;">磁盘</a><a href="/tags/网址/" style="font-size: 10.00px;">网址</a><a href="/tags/虚拟机/" style="font-size: 16.67px;">虚拟机</a><a href="/tags/运维/" style="font-size: 13.33px;">运维</a><a href="/tags/面试/" style="font-size: 13.33px;">面试</a>
+  </div>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=3254648682&verifier=c306487b&dpc=1"></iframe>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+<li><a href="http://zipperary.com/" title="Zippera's Blog">Zippera</a></li>
+<li><a href="http://blog.yangcan.me" title="yangcan's Blog">Yangcan</a></li>
+<li><a href="http://shencan.net" title="shencan's Blog">Shencan</a></li>
+</ul>
+</div>
+
+
+  <div class="widget tag">
+<h3 class="title">特价商场</h3>
+<ul class="entry">
+<li><a href="http://www.tmallwa.com/"><img src="http://config.5937.com/Jimage/logo/684eff29709ef96f182a917acb2bd8d4.png" width="280"></a></li>
+<li><a href="http://www.tmallwa.com/">www.tmallwa.com</a></li>
+</ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 snom
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff501752a59d5d204ac71a701b1bd2050' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+</body>
+</html>

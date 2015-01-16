@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML><HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=gb2312"> 
+<TITLE>错误：您所请求的网址（URL）无法获取</TITLE>
+<STYLE type="text/css"><!--BODY{background-color:#ffffff;font-family:verdana,sans-serif}PRE{font-family:sans-serif}--></STYLE>
+</HEAD><BODY>
+<H1>错误</H1>
+<H2>您所请求的网址（URL）无法获取</H2>
+<HR noshade size="1px">
+<P>
+当尝试进行以下请求时：
+<PRE>
+GET /9/2f/02/1129917890305022f9l.jpg%22%7D,%20%7B%22pin_id%22:290634731,%20%22user_id%22:12807557,%20%22board_id%22:15872980,%20%22file_id%22:64481709,%20%22file%22:%7B%22farm%22:%22farm1%22,%20%22bucket%22:%22hbimg%22,%20%22key%22:%22763f7c3a159bb7d3fb85338ac9db2f45b318ce2131645-mBvDXb%22,%20%22type%22:%22image/jpeg%22,%20%22width%22:600,%20%22height%22:791,%20%22frames%22:1%7D,%20%22media_type%22:0,%20%22source%22:null,%20%22link%22:null,%20%22raw_text%22:%22%22,%20%22text_meta%22:%7B%7D,%20%22via%22:290250977,%20%22via_user_id%22:15044179,%20%22original%22:290024252,%20%22created_at%22:1418299388,%20%22like_count%22:1,%20%22comment_count%22:0,%20%22repin_count%22:0,%20%22is_private%22:0,%20%22orig_source%22:null%7D,%20%7B%22pin_id%22:289811384,%20%22user_id%22:12807557,%20%22board_id%22:15872980,%20%22file_id%22:63678571,%20%22file%22:%7B%22farm%22:%22farm1%22,%20%22bucket%22:%22hbimg%22,%20%22key%22:%2229458bf5c68d5d86238a5292d117eaa897dddb17530f1-ZoVRQK%22,%20%22type%22:%22image/jpeg%22,%20%22width%22:609,%20%22height%22:915,%20%22frames%22:1,%20%22theme%22:%22534557%22%7D,%20%22media_type%22:0,%20%22source%22:%22heiguang.com%22,%20%22link%22:%22http://www.heiguang.com/showphoto.php?contentid=39927%22,%20%22raw_text%22:%22%E5%A4%8D%E5%8F%A4%E4%B8%8B%E7%9A%84%E6%80%A7%E6%84%9F%E7%BE%8E%22,%20%22text_meta%22:%7B%7D,%20%22via%22:289669723,%20%22via_user_id%22:10109,%20%22original%22:281279661,%20%22created_at%22:1418201348,%20%22like_count%22:0,%20%22comment_count%22:0,%20%22repin_count%22:0,%20%22is_private%22:0,%20%22orig_source%22:null%7D,%20%7B%22pin_id%22:289226999,%20%22user_id%22:12807557,%20%22board_id%22:15872980,%20%22file_id%22:59997945,%20%22file%22:%7B%22farm%22:%22farm1%22,%20%22bucket%22:%22hbimg%22,%20%22key%22:%22f030613c4c0fac45b80fc78988ff57b49468ea1813450-BtVGYw%22,%20%22type%22:%22image/jpeg%22,%20%22width%22:553,%20%22height%22:728,%20%22frames%22:1%7D,%20%22media_type%22:0,%20%22source%22:null,%20%22link%22:%22%22,%20%22raw_text%22:%22%E7%94%9F%E6%B4%BB%E7%9A%84%E6%88%8F%E5%89%A7%E5%8C%96%E6%98%AF%E4%B8%8D%E5%81%A5%E5%BA%B7%E7%9A%84%E3%80%82%E5%83%8F%E6%88%91%E4%BB%AC%E8%BF%99%E6%A0%B7%E7%94%9F%E9%95%BF%E5%9C%A8%E9%83%BD%E5%B8%82%E6%96%87%E5%8C%96%E4%B8%AD%E7%9A%84%E4%BA%BA%EF%BC%8C%E6%80%BB%E6%98%AF%E5%85%88%E7%9C%8B%E8%A7%81%E6%B5%B7%E7%9A%84%E5%9B%BE%E7%94%BB%EF%BC%8C%E5%86%8D%E7%9C%8B%E8%A7%81%E6%B5%B7%EF%BC%9B%E5%85%88%E8%AF%BB%E5%88%B0%E7%88%B1%E6%83%85%E5%B0%8F%E8%AF%B4%EF%BC%8C%E5%90%8E%E7%9F%A5%E9%81%93%E7%88%B1%E3%80%82www.dgmilan.com%20%20%22,%20%22text_meta%22:%7B%7D,%20%22via%22:288208731,%20%22via_user_id%22:9537124,%20%22original%22:249816041,%20%22created_at%22:1418123475,%20%22like_count%22:0,%20%22comment_count%22:0,%20%22repin_count%22:0,%20%22is_private%22:0,%20%22orig_source%22:null%7D,%20%7B%22pin_id%22:289226808,%20%22user_id%22:12807557,%20%22board_id%22:15872980,%20%22file_id%22:38714690,%20%22file%22:%7B%22farm%22:%22farm1%22,%20%22bucket%22:%22hbimg%22,%20%22key%22:%228ea3668df7c78e8a5ca9d77afb4d0ff8ac3c6f852e139-iAFqi2%22,%20%22type%22:%22image/jpeg%22,%20%22width%22:463,%20%22height%22:696,%20%22frames%22:1%7D,%20%22media_type%22:0,%20%22source%22:%2238.media.tumblr.com%22,%20%22link%22:%22http://38.media.tumblr.com/58990c485af255a4d117c666b91a7adc/tumblr_mwfnszOlRu1sj1trso1_500.jpg%22,%20%22raw_text%22:%22%22,%20%22text_meta%22:%7B%7D,%20%22via%22:288419457,%20%22via_user_id%22:15044179,%20%22original%22:287326148,%20%22created_at%22:1418123452,%20%22like_count%22:0,%20%22comment_count%22:0,%20%22repin_count%22:1,%20%22is_private%22:0,%20%22orig_source%22:null%7D,%20%7B%22pin_id%22:289226626,%20%22user_id%22:12807557,%20%22board_id%22:15872980,%20%22file_id%22:64279621,%20%22file%22:%7B%22farm%22:%22farm1%22,%20%22bucket%22:%22hbimg%22,%20%22key%22:%224679c2bd406fefab021e6312d08b29e7e8e7273f25aaf-Qc7hge%22,%20%22type%22:%22image/jpeg%22,%20%22width%22:640,%20%22height%22:960,%20%22frames%22:1%7D,%20%22media_type%22:0,%20%22source%22:%22pp.163.com%22,%20%22link%22:%22http://pp.163.com/yizeqi/pp/13871051.html%22,%20%22raw_text%22:%22%20#%E4%BC%98%E9%9B%85#%20#%E8%90%8C#%22,%20%22text_meta%22:%7B%22tags%22:[%7B%22start%22:1,%20%22offset%22:4%7D,%20%7B%22start%22:6,%20%22offset%22:3%7D]%7D,%20%22via%22:289171446,%20%22via_user_id%22:10109,%20%22original%22:287556389,%20%22created_at%22:1418123429,%20%22like_count%22:0,%20%22comment_count%22:0,%20%22repin_count%22:0,%20%22is_private%22:0,%20%22orig_source%22:null%7D,%20%7B%22pin_id%22:287893027,%20%22user_id%22:12807557,%20%22board_id%22:15872980,%20%22file_id%22:42970588,%20%22file%22:%7B%22farm%22:%22farm1%22,%20%22bucket%22:%22hbimg%22,%20%22key%22:%226c09400cadf788ee902f658598e74969d47d57b0113dd-6UCogt%22,%20%22type%22:%22image/jpeg%22,%20%22width%22:589,%20%22height%22:800,%20%22frames%22:1%7D,%20%22media_type%22:0,%20%22source%22:%22media-cache-ec0.pinimg.com%22,%20%22link%22:%22http://media-cache-ec0.pinimg.com/736x/b6/f5/95/b6f5958c6dab3d8ccc87ba6656195076.jpg HTTP/1.0
+Host: f9.topit.me
+User-Agent: Python-urllib/1.17
+
+
+</PRE>
+<P>
+发生了下列的错误：
+<UL>
+<LI>
+<STRONG>
+Invalid Request
+<BR>
+无效的请求
+</STRONG>
+</UL>
+
+<P>
+Some aspect of the HTTP Request is invalid.  Possible problems:
+<BR>
+HTTP 请求的某些方面是无效的。可能是下列问题：
+<UL>
+<LI>Missing or unknown request method
+<BR>缺少请求方式或未知的请求方式
+<LI>Missing URL
+<BR>缺少网址
+<LI>Missing HTTP Identifier (HTTP/1.0)
+<BR>缺少 HTTP 标识（HTTP/1.0）
+<LI>Request is too large
+<BR>请求命令过长
+<LI>Content-Length missing for POST or PUT requests
+<BR>POST 或 PUT 请求缺少内容长度
+<LI>Illegal character in hostname; underscores are not allowed
+<BR>主机名称中包含不合法的字符；下划线是不允许的。
+</UL>
+</P>
+<P>本缓存服务器管理员：<A HREF="mailto:support@chinacache.com">support@chinacache.com</A>. 

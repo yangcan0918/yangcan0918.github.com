@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Error>
+  <Code>NoSuchKey</Code>
+  <Message>The specified key does not exist.</Message>
+  <Key>wood/m38826-1342890800976.jpg"}, {"pin_id":303763953, "user_id":11988714, "board_id":18975263, "file_id":16584813, "file":{"farm":"farm1", "bucket":"hbimg", "key":"781520ab8212a292ed1fc3fe669e3dd1eb8d59d025514-ZhQYie", "type":"image/jpeg", "width":600, "height":868, "frames":1}, "media_type":0, "source":"kan.weibo.com", "link":"http://kan.weibo.com/con/3561703455671044</Key>
+  <RequestId>54AFCB9ACA78F7C7F09748ED</RequestId>
+  <HostId>cdntest.aliyun.com</HostId>
+</Error>
