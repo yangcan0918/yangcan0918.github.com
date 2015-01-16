@@ -1,0 +1,360 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>恢复rm删除文件 | linux运维学习与交流中心</title>
+  <meta name="author" content="snom">
+  
+  <meta name="description" content="本博客主要用来记录linux相关的文章">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="恢复rm删除文件"/>
+  <meta property="og:site_name" content="linux运维学习与交流中心"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+ <link href="/favicon.ico" rel="icon" type="image/x-ico"> 
+  <link rel="alternate" href="/atom.xml" title="linux运维学习与交流中心" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">linux运维学习与交流中心</a></h1>
+  <h2><a href="/">技术永无止境</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">存档</a></li>
+    
+      <li><a href="/美女">关于</a></li>
+    
+      <li><a href="/todolist">ToDo</a></li>
+    
+      <li><a href="/Photos">Photos</a></li>
+    
+      <li> <a href="/atom.xml">RSS</a> </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-01-16T07:59:26.000Z"><a href="/2015/01/16/恢复rm删除文件/">1月 16 2015</a></time>
+      
+      
+  
+    <h1 class="title">恢复rm删除文件</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>手太快，肠子都毁清了。本来是删除一个文件 rm path/myfile.txt<br>结果不知为何加了个<em>，变成了<br>rm path/myfile.txt </em><br>赶紧ls，发现所有代码都化为了乌有，还没提交，还没备份。删除时还不确认。一秒钟，世界就清净了。<br>带着侥幸的心情四处寻找，并无一处压缩包备份。有一些备份的地方也是很早期的工作。<br>欲哭无泪。<br>所以linux的rm删除时不先备份，真是要不得。难怪很多人rm时左看右看得过个半分钟才敢下手。有人建议直接将root下的rm改成mv的别名。<br>没办法，必须恢复。<br>机器在机房里，也不能断电拔硬盘或者重启。<br><a id="more"></a></p>
+<h3 id="首先，需立即将磁盘挂载为只读。">首先，需立即将磁盘挂载为只读。</h3>
+<p>否则其他daemons 都来读写，神仙都恢复不了了。磁盘规划时一定要做功能分区。否则，误删了想恢复也很困难。比如linux安装时不分区整个装/下面，就很麻烦。</p>
+<h4 id="/data挂在/dev/sdb1上">/data挂在/dev/sdb1上</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root@hs12 sh]# mount</div><div class="line">/dev/sdb1 on /<span class="typedef"><span class="keyword">data</span> <span class="keyword">type</span> ext4 <span class="container">(<span class="title">rw</span>)</span></span></div><div class="line">[root@hs12 hadoop]# mount -r -n -o remount /<span class="typedef"><span class="keyword">data</span></span></div><div class="line"><span class="title">mount</span>: /<span class="typedef"><span class="keyword">data</span> is busy</span></div></pre></td></tr></table></figure>
+
+<h4 id="这需看看有哪些进程在用：">这需看看有哪些进程在用：</h4>
+<pre><code>[root<span class="variable">@hs12</span> hadoop]<span class="comment"># fuser -v -m /data</span>
+</code></pre><h4 id="可以看到有很多java和hadoop进程在使用，杀之。">可以看到有很多java和hadoop进程在使用，杀之。</h4>
+<pre><code>[root<span class="variable">@hs12</span> hadoop]<span class="comment"># mount -r -n -o remount /data</span>
+</code></pre><p>成功。</p>
+<h4 id="再到/data里touch文件，报错。">再到/data里touch文件，报错。</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root<span class="variable">@hs12</span> data]<span class="comment"># touch a</span></div><div class="line">touch: cannot touch <span class="string">`a’: Read-only file system</span></div></pre></td></tr></table></figure>
+
+<p>一下就放轻松了很多。因为改为只读挂载后，可以慢慢恢复，再也不用担心我的文件被覆盖。</p>
+<h3 id="使用debugfs">使用debugfs</h3>
+<h4 id="用debugfs查找被删文件的inode，再想法恢复。">用debugfs查找被删文件的inode，再想法恢复。</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root@hs12 ~]<span class="preprocessor"># debugfs /dev/sdb1</span></div><div class="line">debugfs <span class="number">1.41</span><span class="number">.12</span> (<span class="number">17</span>-May-<span class="number">2010</span>)</div><div class="line"><span class="label">debugfs:</span></div><div class="line"><span class="label">debugfs:</span> lsdel</div><div class="line">Inode Owner Mode Size Blocks Time deleted</div><div class="line"><span class="number">0</span> deleted inodes found.</div></pre></td></tr></table></figure>
+
+<p>神奇的debugfs 根本没找到有文件被删除的inodes，难道是我不会用？<br>失败！</p>
+<h3 id="使用grep恢复">使用grep恢复</h3>
+<p>grep 在磁盘二进制中查找文本，把前后的字符导出来，也许可以恢复部分。<br>    [root@hs12 hadoop]# grep -a -B 100 -A 100 ‘active.sh’ /dev/sdb1 &gt; results.txt<br>只有一些乱七八糟的二进制。<br>失败！</p>
+<h3 id="使用ext3grep">使用ext3grep</h3>
+<p>我的是ext4系统，根本不起作用。</p>
+<p>只好寻找专业工具</p>
+<h3 id="用testdisk_6-14">用testdisk 6.14</h3>
+<h4 id="使用介绍：">使用介绍：</h4>
+<pre><code><span class="label">http:</span>//www.cgsecurity<span class="preprocessor">.org</span>/wiki/TestDisk%<span class="number">3</span>a_undelete_file_for_ext2
+</code></pre><h4 id="下载：">下载：</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget http:<span class="comment">//www.cgsecurity.org/testdisk-6.14.linux26-x86_64.tar.bz2</span></div></pre></td></tr></table></figure>
+
+<h4 id="执行命令">执行命令</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root@hs12 hadoop]# cd testdisk-<span class="number">6.14</span></div><div class="line">[root@hs12 testdisk-<span class="number">6.14</span>]# ls</div><div class="line">Android.mk ChangeLog documentation.html fidentify_static INFO l photorec<span class="number">.8</span> README testdisk<span class="number">.8</span> testdisk_static VERSION</div><div class="line">AUTHORS COPYING fidentify<span class="number">.8</span> ico jni NEWS photorec_static readme.txt testdisk.log THANKS</div><div class="line">[root@hs12 testdisk-<span class="number">6.14</span>]# ./testdisk_static</div><div class="line">TestDisk <span class="number">6.14</span>, Data Recovery Utility, July <span class="number">2013</span></div><div class="line">Christophe GRENIER &lt;grenier@cgsecurity.org&gt;</div><div class="line">http://www.cgsecurity.org</div><div class="line"><span class="number">1</span> P MS Data <span class="number">2048</span> <span class="number">7811889151</span> <span class="number">7811887104</span> [primary]</div><div class="line">Directory /</div><div class="line">&gt;drwxr-xr-x <span class="number">500</span> <span class="number">500</span> <span class="number">4096</span> <span class="number">28</span>-Aug-<span class="number">2013</span> <span class="number">13</span>:<span class="number">41</span> .</div><div class="line">drwxr-xr-x <span class="number">500</span> <span class="number">500</span> <span class="number">4096</span> <span class="number">28</span>-Aug-<span class="number">2013</span> <span class="number">13</span>:<span class="number">41</span> ..</div><div class="line">drwxrwxrwx <span class="number">500</span> <span class="number">500</span> <span class="number">16384</span> <span class="number">18</span>-Jul-<span class="number">2013</span> <span class="number">15</span>:<span class="number">42</span> lost+found</div><div class="line">drwxrwxrwx <span class="number">500</span> <span class="number">500</span> <span class="number">12288</span> <span class="number">12</span>-Sep-<span class="number">2013</span> <span class="number">00</span>:<span class="number">36</span> logs</div><div class="line">drwxrwxrwx <span class="number">500</span> <span class="number">500</span> <span class="number">4096</span> <span class="number">25</span>-Jul-<span class="number">2013</span> <span class="number">16</span>:<span class="number">54</span> test1</div><div class="line">drwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">4096</span> <span class="number">12</span>-Sep-<span class="number">2013</span> <span class="number">03</span>:<span class="number">28</span> statis</div><div class="line">drwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">4096</span> <span class="number">12</span>-Sep-<span class="number">2013</span> <span class="number">17</span>:<span class="number">40</span> sh</div><div class="line">drwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">12288</span> <span class="number">3</span>-Sep-<span class="number">2013</span> <span class="number">15</span>:<span class="number">28</span> hadoop</div><div class="line"><span class="keyword">Next</span></div><div class="line"><span class="keyword">Use</span> Right <span class="keyword">to</span> change directory, h <span class="keyword">to</span> hide deleted files</div><div class="line">q <span class="keyword">to</span> quit, : <span class="keyword">to</span> <span class="keyword">select</span> the current <span class="keyword">file</span>, a <span class="keyword">to</span> <span class="keyword">select</span> <span class="keyword">all</span> files</div><div class="line">C <span class="keyword">to</span> copy the selected files, c <span class="keyword">to</span> copy the current <span class="keyword">file</span></div></pre></td></tr></table></figure>
+
+<h4 id="选到相应目录，enter，终于看到了删除的文件名，但是文件大小怎么都是0啊？">选到相应目录，enter，终于看到了删除的文件名，但是文件大小怎么都是0啊？</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">TestDisk 6.14, Data Recovery Utility, July 2013</div><div class="line">Christophe GRENIER &lt;grenier@cgsecurity.org&gt;</div><div class="line">http://www.cgsecurity.org</div><div class="line">1 P MS Data 2048 7811889151 7811887104 [primary]</div><div class="line">Directory /sh</div><div class="line">drwxrwxr-x 500 500 4096 12-Sep-2013 17:40 .</div><div class="line">drwxr-xr-x 500 500 4096 28-Aug-2013 13:41 ..</div><div class="line">&gt;-rwxrwxr-x 500 500 0 12-Sep-2013 17:40 active.awk</div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> active.sh</span></div><div class="line">lrwxrwxrwx 500 500 13 2-Aug-2013 17:17 statis</div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> dateutil.sh</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> hiveput.sh</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> multidate.sh</span></div><div class="line">drwxrwxr-x 500 500 4096 3-Sep-2013 15:24 errlogs</div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> hiveactive.sh</span></div><div class="line">drwxrwxr-x 500 500 4096 12-Sep-2013 17:40 cps</div><div class="line">drwxrwxr-x 500 500 4096 30-Aug-2013 15:21 TempStatsStore</div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> bkactive.awk</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> test.awk</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> t.awk</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> print</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> a</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> a.txt</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> user.awk</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> luan</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> cps.sh</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> hivenewdev.sh</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> hive2mysql.sh</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> py</span></div><div class="line">lrwxrwxrwx 500 500 12 26-Aug-2013 09:34 userdata</div><div class="line">lrwxrwxrwx 500 500 10 26-Aug-2013 09:34 bidata</div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> bi.awk</span></div><div class="line">-<span class="ruby">rw-r–r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> luandoutang_09_900037.csv</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> luan1</span></div><div class="line">-<span class="ruby">rwxr-xr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> luan.awk</span></div><div class="line">-<span class="ruby">rwxr-xr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> luan.sh</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> dvid_price.awk</span></div><div class="line">-<span class="ruby">rwxrwxr-x <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> cid_price.awk</span></div><div class="line">lrwxrwxrwx 500 500 15 9-Sep-2013 13:33 adsdkdata</div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> 0908.txt</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> 09081.txt</span></div><div class="line">-<span class="ruby">rw-rw-r– <span class="number">500</span> <span class="number">500</span> <span class="number">0</span> <span class="number">12</span>-<span class="constant">Sep</span>-<span class="number">2013</span> <span class="number">17</span><span class="symbol">:</span><span class="number">40</span> 09.txt</span></div><div class="line">drwxrwxr-x 500 500 4096 9-Sep-2013 16:22 pid</div><div class="line">TestDisk 6.14, Data Recovery Utility, July 2013</div><div class="line">Please select a destination where /sh/active.awk will be copied.</div><div class="line">Keys: Arrow keys to select another directory</div><div class="line">C when the destination is correct</div><div class="line">Q to quit</div></pre></td></tr></table></figure>
+
+<p>用a 选择所有文件，C 备份，选一个备份到的目录，确认。<br>进去一看，文件名都恢复了，但文件内容都是空的。号称能恢复ext4的testdisk恢复失败。<br>又下了新版testdisk-7.0-WIP.linux26-x86_64.tar.bz2，一样的问题。</p>
+<h3 id="用extundelete-0-2-4恢复">用extundelete-0.2.4恢复</h3>
+<h4 id="官方网站：">官方网站：</h4>
+<pre><code>http:<span class="comment">//extundelete.sourceforge.net/</span>
+</code></pre><h4 id="下载：-1">下载：</h4>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div></pre></td><td class="code"><pre><div class="line">    wget http://downloads.sourceforge.net/project/extundelete/extundelete/0.2.4/extundelete-0.2.4.tar.bz2</div><div class="line">extundelete依赖e2fsprogs</div><div class="line">[root@hs12 extundelete-0.2.4]# ./configure</div><div class="line">Configuring extundelete 0.2.4</div><div class="line">configure: error: Can’t find ext2fs library</div><div class="line">[root@hs12 extundelete-0.2.4]# yum <span class="operator"><span class="keyword">install</span> e2fsprogs-devel</span></div><div class="line">[root@hs12 extundelete-<span class="number">0.2</span><span class="number">.4</span>]# ./configure</div><div class="line">Configuring extundelete <span class="number">0.2</span><span class="number">.4</span></div><div class="line">Writing generated files <span class="keyword">to</span> disk</div><div class="line">[root@hs12 extundelete-<span class="number">0.2</span><span class="number">.4</span>]# make & make <span class="keyword">install</span></div><div class="line">[root@hs12 extundelete-<span class="number">0.2</span><span class="number">.4</span>]# cd src</div><div class="line">[root@hs12 src]# ls</div><div class="line">block.c cli.cc extundelete-block.o extundelete-cli.o extundelete.h extundelete-priv.h jfs_compat.h Makefile Makefile.<span class="keyword">in</span></div><div class="line">block.h extundelete extundelete.cc extundelete-extundelete.o extundelete-insertionops.o insertionops.cc kernel-jbd.h Makefile.am</div><div class="line">[root@hs12 src]# ./extundelete</div><div class="line"><span class="keyword">No</span> <span class="keyword">action</span> specified; implying –superblock.</div><div class="line">./extundelete: Missing device name.</div><div class="line">Usage: ./extundelete [options] [<span class="comment">--] device-file</span></div><div class="line">Options:</div><div class="line">–version, -[vV] Print version and exit successfully.</div><div class="line">–<span class="operator"><span class="keyword">help</span>, Print this <span class="keyword">help</span> <span class="keyword">and</span> exit successfully.</span></div><div class="line">–superblock Print contents <span class="keyword">of</span> superblock <span class="keyword">in</span> addition <span class="keyword">to</span> the rest.</div><div class="line"><span class="keyword">If</span> <span class="keyword">no</span> <span class="keyword">action</span> <span class="keyword">is</span> specified <span class="keyword">then</span> this <span class="keyword">option</span> <span class="keyword">is</span> implied.</div><div class="line">–journal <span class="keyword">Show</span> content <span class="keyword">of</span> journal.</div><div class="line">–<span class="keyword">after</span> dtime <span class="keyword">Only</span> process entries deleted <span class="keyword">on</span> <span class="keyword">or</span> <span class="keyword">after</span> ‘dtime’.</div><div class="line">–<span class="keyword">before</span> dtime <span class="keyword">Only</span> process entries deleted <span class="keyword">before</span> ‘dtime’.</div><div class="line">Actions:</div><div class="line">–inode ino <span class="keyword">Show</span> info <span class="keyword">on</span> inode ‘ino’.</div><div class="line">–block blk <span class="keyword">Show</span> info <span class="keyword">on</span> block ‘blk’.</div><div class="line">–<span class="keyword">restore</span>-inode ino[,ino,...]</div><div class="line"><span class="keyword">Restore</span> the file(s) <span class="keyword">with</span> known inode <span class="built_in">number</span> ‘ino’.</div><div class="line">The restored files <span class="keyword">are</span> created <span class="keyword">in</span> ./RECOVERED_FILES</div><div class="line"><span class="keyword">with</span> their inode <span class="built_in">number</span> <span class="keyword">as</span> extension (ie, file<span class="number">.12345</span>).</div><div class="line">–<span class="keyword">restore</span>-file ‘path’ Will <span class="keyword">restore</span> file ‘path’. ‘path’ <span class="keyword">is</span> <span class="keyword">relative</span> <span class="keyword">to</span> root</div><div class="line"><span class="keyword">of</span> the <span class="keyword">partition</span> <span class="keyword">and</span> does <span class="keyword">not</span> <span class="keyword">start</span> <span class="keyword">with</span> a ‘/’</div><div class="line">The restored file <span class="keyword">is</span> created <span class="keyword">in</span> the <span class="keyword">current</span></div><div class="line">directory <span class="keyword">as</span> ‘RECOVERED_FILES/path’.</div><div class="line">–<span class="keyword">restore</span>-files ‘path’ Will <span class="keyword">restore</span> files which <span class="keyword">are</span> listed <span class="keyword">in</span> the file ‘path’.</div><div class="line"><span class="keyword">Each</span> filename should be <span class="keyword">in</span> the same <span class="keyword">format</span> <span class="keyword">as</span> an <span class="keyword">option</span></div><div class="line"><span class="keyword">to</span> –<span class="keyword">restore</span>-file, <span class="keyword">and</span> there should be one per line.</div><div class="line">–<span class="keyword">restore</span>-directory ‘path’</div><div class="line">Will <span class="keyword">restore</span> directory ‘path’. ‘path’ <span class="keyword">is</span> <span class="keyword">relative</span> <span class="keyword">to</span> the</div><div class="line">root directory <span class="keyword">of</span> the file system. The restored</div><div class="line">directory <span class="keyword">is</span> created <span class="keyword">in</span> the <span class="keyword">output</span> directory <span class="keyword">as</span> ‘path’.</div><div class="line">–<span class="keyword">restore</span>-<span class="keyword">all</span> Attempts <span class="keyword">to</span> <span class="keyword">restore</span> everything.</div><div class="line">-j journal Reads an <span class="keyword">external</span> journal <span class="keyword">from</span> the named file.</div><div class="line">-b blocknumber Uses the <span class="keyword">backup</span> superblock <span class="keyword">at</span> blocknumber <span class="keyword">when</span> opening</div><div class="line">the file system.</div><div class="line">-B blocksize Uses blocksize <span class="keyword">as</span> the block <span class="keyword">size</span> <span class="keyword">when</span> opening the file</div><div class="line">system. The <span class="built_in">number</span> should be the <span class="built_in">number</span> <span class="keyword">of</span> bytes.</div><div class="line">–<span class="keyword">log</span> <span class="number">0</span> Make the program silent.</div><div class="line">–<span class="keyword">log</span> filename <span class="keyword">Logs</span> <span class="keyword">all</span> messages <span class="keyword">to</span> filename.</div><div class="line">–<span class="keyword">log</span> D1=<span class="number">0</span>,D2=filename Custom control <span class="keyword">of</span> <span class="keyword">log</span> messages <span class="keyword">with</span> comma-separated</div><div class="line">Examples below: list <span class="keyword">of</span> options. Dn must be one <span class="keyword">of</span> info, warn, <span class="keyword">or</span></div><div class="line">–<span class="keyword">log</span> info,error error. Omission <span class="keyword">of</span> the ‘=name’ results <span class="keyword">in</span> messages</div><div class="line">–<span class="keyword">log</span> warn=<span class="number">0</span> <span class="keyword">with</span> the specified <span class="keyword">level</span> <span class="keyword">to</span> be logged <span class="keyword">to</span> the console.</div><div class="line">–<span class="keyword">log</span> error=filename <span class="keyword">If</span> the parameter <span class="keyword">is</span> ‘=<span class="number">0</span>′, logging <span class="keyword">for</span> the specified</div><div class="line"><span class="keyword">level</span> will be turned off. <span class="keyword">If</span> the parameter <span class="keyword">is</span></div><div class="line">‘=filename’, messages <span class="keyword">with</span> that <span class="keyword">level</span> will be written</div><div class="line"><span class="keyword">to</span> filename.</div><div class="line">-o directory Save the recovered files <span class="keyword">to</span> the named directory.</div><div class="line">The restored files <span class="keyword">are</span> created <span class="keyword">in</span> a directory</div><div class="line">named ‘RECOVERED_FILES/’ <span class="keyword">by</span> <span class="keyword">default</span>.</div><div class="line">./extundelete: Error parsing command-line options.</div><div class="line">[root@hs12 src]# ./extundelete /dev/sdb1 –<span class="keyword">restore</span>-directory /<span class="keyword">data</span>/sh</div><div class="line">NOTICE: <span class="keyword">Extended</span> attributes <span class="keyword">are</span> <span class="keyword">not</span> restored.</div><div class="line">Loading filesystem metadata … <span class="number">29800</span> groups loaded.</div><div class="line">Loading journal descriptors … <span class="number">28266</span> descriptors loaded.</div><div class="line">Failed <span class="keyword">to</span> <span class="keyword">restore</span> file /<span class="keyword">data</span>/sh</div><div class="line">Could <span class="keyword">not</span> find correct inode <span class="built_in">number</span> past inode <span class="number">2.</span></div><div class="line">Try altering the filename <span class="keyword">to</span> one <span class="keyword">of</span> the entries listed below.</div><div class="line">File name | Inode <span class="built_in">number</span> | Deleted <span class="keyword">status</span></div><div class="line">. <span class="number">2</span></div><div class="line">.. <span class="number">2</span></div><div class="line">lost+<span class="keyword">found</span> <span class="number">11</span></div><div class="line"><span class="keyword">logs</span> <span class="number">195821569</span></div><div class="line">dfs <span class="number">14942209</span></div><div class="line">mapred <span class="number">165806081</span></div><div class="line">bidata <span class="number">221380609</span></div><div class="line">userdata <span class="number">3407873</span></div><div class="line">trackdata <span class="number">112459777</span></div><div class="line">adsdkdata <span class="number">135135233</span></div><div class="line">test <span class="number">227409921</span></div><div class="line">a.tar.gz <span class="number">12</span></div><div class="line">t1 <span class="number">13</span> Deleted</div><div class="line">test1 <span class="number">227278849</span></div><div class="line">statis <span class="number">109051905</span></div><div class="line">sh <span class="number">24641537</span></div><div class="line">hadoop <span class="number">59506689</span></div><div class="line">./extundelete: Operation <span class="keyword">not</span> permitted while restoring directory.</div><div class="line">./extundelete: Operation <span class="keyword">not</span> permitted <span class="keyword">when</span> trying <span class="keyword">to</span> examine filesystem</div><div class="line">[root@hs12 src]# ./extundelete /dev/sdb1 –<span class="keyword">restore</span>-file /<span class="keyword">data</span>/sh/active.awk</div><div class="line">NOTICE: <span class="keyword">Extended</span> attributes <span class="keyword">are</span> <span class="keyword">not</span> restored.</div><div class="line">Loading filesystem metadata … <span class="number">29800</span> groups loaded.</div><div class="line">Loading journal descriptors … <span class="number">28266</span> descriptors loaded.</div><div class="line">Failed <span class="keyword">to</span> <span class="keyword">restore</span> file /<span class="keyword">data</span>/sh/active.awk</div><div class="line">Could <span class="keyword">not</span> find correct inode <span class="built_in">number</span> past inode <span class="number">2.</span></div><div class="line">Try altering the filename <span class="keyword">to</span> one <span class="keyword">of</span> the entries listed below.</div><div class="line">File name | Inode <span class="built_in">number</span> | Deleted <span class="keyword">status</span></div><div class="line">. <span class="number">2</span></div><div class="line">.. <span class="number">2</span></div><div class="line">lost+<span class="keyword">found</span> <span class="number">11</span></div><div class="line"><span class="keyword">logs</span> <span class="number">195821569</span></div><div class="line">dfs <span class="number">14942209</span></div><div class="line">mapred <span class="number">165806081</span></div><div class="line">bidata <span class="number">221380609</span></div><div class="line">userdata <span class="number">3407873</span></div><div class="line">trackdata <span class="number">112459777</span></div><div class="line">adsdkdata <span class="number">135135233</span></div><div class="line">test <span class="number">227409921</span></div><div class="line">a.tar.gz <span class="number">12</span></div><div class="line">t1 <span class="number">13</span> Deleted</div><div class="line">test1 <span class="number">227278849</span></div><div class="line">statis <span class="number">109051905</span></div><div class="line">sh <span class="number">24641537</span></div><div class="line">hadoop <span class="number">59506689</span></div><div class="line">./extundelete: Operation <span class="keyword">not</span> permitted while restoring file.</div><div class="line">./extundelete: Operation <span class="keyword">not</span> permitted <span class="keyword">when</span> trying <span class="keyword">to</span> examine filesystem</div><div class="line">[root@hs12 RECOVERED_FILES]# ../extundelete /dev/sdb1 –<span class="keyword">restore</span>-<span class="keyword">all</span></div><div class="line">NOTICE: <span class="keyword">Extended</span> attributes <span class="keyword">are</span> <span class="keyword">not</span> restored.</div><div class="line">Loading filesystem metadata … <span class="number">29800</span> groups loaded.</div><div class="line">Loading journal descriptors … <span class="number">28266</span> descriptors loaded.</div><div class="line">[root@hs12 RECOVERED_FILES]# cd RECOVERED_FILES/</div><div class="line">[root@hs12 RECOVERED_FILES]# cd sh</div><div class="line">[root@hs12 sh]# ls</div><div class="line"><span class="number">09081.</span>txt a bknewdev.awk charge.sh derby.<span class="keyword">log</span> hive2mysql.sh luan.awk newdev.awk so.awk</div><div class="line"><span class="number">0908.</span>txt active.awk b.txt charge.txt dvid_price.awk hiveactive.sh luandoutang_09_900037.csv newdev.sh t.awk</div><div class="line"><span class="number">09.</span>txt active.sh charge cid_price.awk emptycid hivenewdev.sh luan.sh pid.awk TempStatsStore</div><div class="line"><span class="number">100001</span> adsdkdata charge_2013-<span class="number">09</span>-<span class="number">09.</span>txt cps err.txt hiveput.sh multidate.sh pid.sh test.awk</div><div class="line"><span class="number">1</span>dev.awk a.txt charge_20130909_.txt cps_newdev.java getdvid.awk insdata.py newdev print <span class="keyword">user</span>.awk</div><div class="line"><span class="number">201309081.</span>txt bi.awk charge2mysql.sh cps.sh getmysql.sh luan newdev1.awk py</div><div class="line"><span class="number">201309091.</span>txt bkactive.awk charge.awk dateutil.sh getnewdev_from_mysql.sh luan1 newdev2mysql.sh sendmail.sh</div><div class="line">[root@hs12 sh]# ls -l</div><div class="line">total <span class="number">225360</span></div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">29251633</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="number">09081.</span>txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">35249787</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="number">0908.</span>txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">64501420</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="number">09.</span>txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">2378</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="number">100001</span></div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">840</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="number">1</span>dev.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">33931129</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="number">201309081.</span>txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">27169653</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="number">201309091.</span>txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> a</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">2227</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> active.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">999</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> active.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">19242484</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> adsdkdata</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">5626</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> a.txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">331</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> bi.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1543</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> bkactive.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">931</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> bknewdev.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">11</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> b.txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">230</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> charge</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">20964603</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> charge_2013-<span class="number">09</span>-<span class="number">09.</span>txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">229</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> charge_20130909_.txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1243</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> charge2mysql.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">428</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> charge.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">2822</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> charge.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">227</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> charge.txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1227</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> cid_price.awk</div><div class="line">drwxr-xr-x <span class="number">2</span> root root <span class="number">4096</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> cps</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">12070</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> cps_newdev.java</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">2764</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> cps.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">885</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> dateutil.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">992</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> derby.<span class="keyword">log</span></div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">658</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> dvid_price.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">54217</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> emptycid</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">64279</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> err.txt</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">379</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> getdvid.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1217</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> getmysql.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1552</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> getnewdev_from_mysql.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">532</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> hive2mysql.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">858</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> hiveactive.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">926</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> hivenewdev.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">683</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> hiveput.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">2227</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> insdata.py</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1045</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> luan</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">813</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> luan1</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">336</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> luan.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">72909</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> luandoutang_09_900037.csv</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">180</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> luan.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">420</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> multidate.sh</div><div class="line">drwxr-xr-x <span class="number">2</span> root root <span class="number">4096</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> newdev</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">777</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> newdev1.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">1290</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> newdev2mysql.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">738</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> newdev.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">762</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> newdev.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">693</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> pid.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">518</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> pid.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">99</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> print</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">30324</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> py</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">160</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> sendmail.sh</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">744</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> so.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">93</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> t.awk</div><div class="line">drwxr-xr-x <span class="number">2</span> root root <span class="number">4096</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> TempStatsStore</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">311</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> test.awk</div><div class="line">-rw-r–r– <span class="number">1</span> root root <span class="number">385</span> Sep <span class="number">12</span> <span class="number">19</span>:<span class="number">46</span> <span class="keyword">user</span>.awk</div><div class="line">[root@hs12 sh]# vi active.awk</div></pre></td></tr></table></figure>
+
+<p>查看，脚本都在。</p>
+<h3 id="整个恢复成功。">整个恢复成功。</h3>
+<p>所以唯一成功的是extundelete ,并且不能指定文件和目录，而是全部恢复，才能成功。<br>一块石头落了地：）<br>经验提供给后来者，一定要备份，磁盘要功能分区。rm命令要 alias rm=”rm -i”.</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/文件恢复/">文件恢复</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/文件恢复/">文件恢复</a>
+  </div>
+
+	
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone"></a><a href="#" class="bds_tsina" data-cmd="tsina"></a><a href="#" class="bds_tqq" data-cmd="tqq"></a><a href="#" class="bds_renren" data-cmd="renren"></a><a href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+ <nav id="pagination" >
+    
+    
+    <a href="/2015/01/16/vim操作/" class="alignright next" >下一页</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<section id="comment">
+<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yangcan"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜索">
+    <input type="hidden" name="q" value="site:www.yangcan.me">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/12306/">12306</a><small>0</small></li>
+  
+    <li><a href="/categories/DNS/">DNS</a><small>1</small></li>
+  
+    <li><a href="/categories/cache/">cache</a><small>1</small></li>
+  
+    <li><a href="/categories/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/categories/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/categories/mac/">mac</a><small>1</small></li>
+  
+    <li><a href="/categories/news/">news</a><small>0</small></li>
+  
+    <li><a href="/categories/php/">php</a><small>2</small></li>
+  
+    <li><a href="/categories/pic/">pic</a><small>1</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+    <li><a href="/categories/sudoer/">sudoer</a><small>1</small></li>
+  
+    <li><a href="/categories/vim/">vim</a><small>1</small></li>
+  
+    <li><a href="/categories/命令/">命令</a><small>2</small></li>
+  
+    <li><a href="/categories/文件恢复/">文件恢复</a><small>1</small></li>
+  
+    <li><a href="/categories/文章/">文章</a><small>1</small></li>
+  
+    <li><a href="/categories/测试工具/">测试工具</a><small>1</small></li>
+  
+    <li><a href="/categories/生活/">生活</a><small>1</small></li>
+  
+    <li><a href="/categories/系统/">系统</a><small>1</small></li>
+  
+    <li><a href="/categories/虚拟机/">虚拟机</a><small>1</small></li>
+  
+    <li><a href="/categories/面试题/">面试题</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">标签</h3>
+  <ul class="entry">
+  
+    <li><a href="/tags/DNS/">DNS</a><small>1</small></li>
+  
+    <li><a href="/tags/cmd/">cmd</a><small>1</small></li>
+  
+    <li><a href="/tags/docker/">docker</a><small>1</small></li>
+  
+    <li><a href="/tags/hexo/">hexo</a><small>1</small></li>
+  
+    <li><a href="/tags/kvm/">kvm</a><small>1</small></li>
+  
+    <li><a href="/tags/mongo/">mongo</a><small>2</small></li>
+  
+    <li><a href="/tags/mysql/">mysql</a><small>1</small></li>
+  
+    <li><a href="/tags/news/">news</a><small>0</small></li>
+  
+    <li><a href="/tags/nginx/">nginx</a><small>1</small></li>
+  
+    <li><a href="/tags/php/">php</a><small>3</small></li>
+  
+    <li><a href="/tags/pic/">pic</a><small>1</small></li>
+  
+    <li><a href="/tags/pypi/">pypi</a><small>1</small></li>
+  
+    <li><a href="/tags/redis/">redis</a><small>1</small></li>
+  
+    <li><a href="/tags/sudoer/">sudoer</a><small>1</small></li>
+  
+    <li><a href="/tags/vim/">vim</a><small>1</small></li>
+  
+    <li><a href="/tags/website/">website</a><small>1</small></li>
+  
+    <li><a href="/tags/wget/">wget</a><small>1</small></li>
+  
+    <li><a href="/tags/工具/">工具</a><small>1</small></li>
+  
+    <li><a href="/tags/文件恢复/">文件恢复</a><small>1</small></li>
+  
+    <li><a href="/tags/文章/">文章</a><small>1</small></li>
+  
+    <li><a href="/tags/泄露信息/">泄露信息</a><small>0</small></li>
+  
+    <li><a href="/tags/磁盘/">磁盘</a><small>1</small></li>
+  
+    <li><a href="/tags/网址/">网址</a><small>0</small></li>
+  
+    <li><a href="/tags/营救模式/">营救模式</a><small>1</small></li>
+  
+    <li><a href="/tags/虚拟机/">虚拟机</a><small>2</small></li>
+  
+    <li><a href="/tags/运维/">运维</a><small>1</small></li>
+  
+    <li><a href="/tags/面试/">面试</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/DNS/" style="font-size: 13.33px;">DNS</a><a href="/tags/cmd/" style="font-size: 13.33px;">cmd</a><a href="/tags/docker/" style="font-size: 13.33px;">docker</a><a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a><a href="/tags/kvm/" style="font-size: 13.33px;">kvm</a><a href="/tags/mongo/" style="font-size: 16.67px;">mongo</a><a href="/tags/mysql/" style="font-size: 13.33px;">mysql</a><a href="/tags/news/" style="font-size: 10.00px;">news</a><a href="/tags/nginx/" style="font-size: 13.33px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/pic/" style="font-size: 13.33px;">pic</a><a href="/tags/pypi/" style="font-size: 13.33px;">pypi</a><a href="/tags/redis/" style="font-size: 13.33px;">redis</a><a href="/tags/sudoer/" style="font-size: 13.33px;">sudoer</a><a href="/tags/vim/" style="font-size: 13.33px;">vim</a><a href="/tags/website/" style="font-size: 13.33px;">website</a><a href="/tags/wget/" style="font-size: 13.33px;">wget</a><a href="/tags/工具/" style="font-size: 13.33px;">工具</a><a href="/tags/文件恢复/" style="font-size: 13.33px;">文件恢复</a><a href="/tags/文章/" style="font-size: 13.33px;">文章</a><a href="/tags/泄露信息/" style="font-size: 10.00px;">泄露信息</a><a href="/tags/磁盘/" style="font-size: 13.33px;">磁盘</a><a href="/tags/网址/" style="font-size: 10.00px;">网址</a><a href="/tags/营救模式/" style="font-size: 13.33px;">营救模式</a><a href="/tags/虚拟机/" style="font-size: 16.67px;">虚拟机</a><a href="/tags/运维/" style="font-size: 13.33px;">运维</a><a href="/tags/面试/" style="font-size: 13.33px;">面试</a>
+  </div>
+</div>
+
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=3254648682&verifier=c306487b&dpc=1"></iframe>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+<ul class="entry">
+<li><a href="http://zipperary.com/" title="Zippera's Blog">Zippera</a></li>
+<li><a href="http://blog.yangcan.me" title="yangcan's Blog">Yangcan</a></li>
+<li><a href="http://shencan.net" title="shencan's Blog">Shencan</a></li>
+</ul>
+</div>
+
+
+  <div class="widget tag">
+<h3 class="title">特价商场</h3>
+<ul class="entry">
+<li><a href="http://www.tmallwa.com/"><img src="http://config.5937.com/Jimage/logo/684eff29709ef96f182a917acb2bd8d4.png" width="280"></a></li>
+<li><a href="http://www.tmallwa.com/">www.tmallwa.com</a></li>
+</ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 snom
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff501752a59d5d204ac71a701b1bd2050' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+<a href="https://github.com/you"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+</body>
+</html>
