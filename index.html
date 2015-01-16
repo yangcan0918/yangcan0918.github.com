@@ -147,22 +147,17 @@
     <div class="entry">
       
         <h3 id="/etc/sudoers">/etc/sudoers</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor"># Sudoers allows particular users to run various commands as</span></div><div class="line"><span class="preprocessor">## the root user, without needing the root password.</span></div><div class="line"><span class="preprocessor">#</span></div><div class="line">&lt;!--more--&gt;</div><div class="line">Defaults    requiretty</div><div class="line"><span class="preprocessor">#</span></div><div class="line">Defaults   !visiblepw</div><div class="line"><span class="preprocessor">#</span></div><div class="line">Defaults    env_reset</div><div class="line">Defaults    env_keep = <span class="string">"COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR                         LS_COLORS MAIL PS1 PS2 QTDIR USERNAME                         LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION                         LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC                         LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS                         _XKB_CHARSET XAUTHORITY"</span></div><div class="line"><span class="preprocessor">#</span></div><div class="line">root    ALL=(ALL)   ALL</div><div class="line">%sysadmin    ALL=(ALL)   NOPASSWD: ALL</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor"># Sudoers allows particular users to run various commands as</span></div><div class="line"><span class="preprocessor">## the root user, without needing the root password.</span></div><div class="line"><span class="preprocessor">#</span></div><div class="line">Defaults    requiretty</div><div class="line"><span class="preprocessor">#</span></div><div class="line">Defaults   !visiblepw</div><div class="line"><span class="preprocessor">#</span></div><div class="line">Defaults    env_reset</div><div class="line">Defaults    env_keep = <span class="string">"COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR                         LS_COLORS MAIL PS1 PS2 QTDIR USERNAME                         LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION                         LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC                         LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS                         _XKB_CHARSET XAUTHORITY"</span></div><div class="line"><span class="preprocessor">#</span></div><div class="line">root    ALL=(ALL)   ALL</div><div class="line">%sysadmin    ALL=(ALL)   NOPASSWD: ALL</div></pre></td></tr></table></figure>
 
-<h3 id="配置文件解说">配置文件解说</h3>
-<pre><code>jorge ALL=(root) <span class="regexp">/usr/</span>bin<span class="regexp">/find,/</span>bin<span class="regexp">/rm</span>
-</code></pre><ul>
-<li>第一栏规定它的适用对象：可以是用户也可以是组，这里是用户jorge,如果是组的话，就需要使用%百分号开头。</li>
-<li>第二栏指定该规则的适用主机，当再多个系统之间部署sudo环境的情况下，会使用到，这里的ALL代表所有的主机<br>，但是如果不想将sudo部署到多个系统的情况下，这一栏就换成相应的主机名</li>
-<li>第三栏的值是放在括号内，指出第一栏规定的用户能够以何种身份来执行命令。本例中，该值设为root，这意味着用户<br>jorge能够以root用户的身份来运行后面列出的命令。该值也可以设成通配符ALL,jorge便能作为系统中的任何用户<br>来执行列出的命令了。</li>
-<li>最后一栏是使用逗号分开的命令表，这些命令能被第一栏规定的用户以第三栏指出的身份来运行它们。本例中，该配置<br>允许Jorege作为超级用户运行./usr/bin/find和 /bin/rm这两个命令。需要指出的是，这里列出的命令一定要使用绝对路径。<br>如果想让用户作为超级用户不必输入密码就能执行Kill命令，以便用户能立刻杀死一个失控的进程。在命令前边加上NOPASSWD属性即可。<br>例如：<br>  jorge ALL=(root) NOPASSWD:/usr/bin/find,/bin/rm<h3 id="将多个命令放在一起">将多个命令放在一起</h3>
-   Cmnd_Alias  PUSH=/usr/bin/vim,/sbin/ifconfig<br>  zhangwenbo    ALL=(ALL)   NOPASSWD: PUSH</li>
-</ul>
-
+<p>
       
     </div>
     <footer>
       
+        
+          <div class="alignleft">
+            <a href="/2015/01/16/sudoer文件详解/#more" class="more-link">阅读全文</a>
+          </div>
         
         
       
