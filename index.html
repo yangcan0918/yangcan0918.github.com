@@ -59,6 +59,51 @@
     <header>
       
         <div class="icon"></div>
+        <time datetime="2015-01-16T07:47:35.000Z"><a href="/2015/01/16/sudoer文件详解/">1月 16 2015</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/01/16/sudoer文件详解/">sudoer文件详解</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="/etc/sudoers">/etc/sudoers</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor"># Sudoers allows particular users to run various commands as</span></div><div class="line"><span class="preprocessor">## the root user, without needing the root password.</span></div><div class="line"><span class="preprocessor">#</span></div><div class="line">&lt;!--more--&gt;</div><div class="line">Defaults    requiretty</div><div class="line"><span class="preprocessor">#</span></div><div class="line">Defaults   !visiblepw</div><div class="line"><span class="preprocessor">#</span></div><div class="line">Defaults    env_reset</div><div class="line">Defaults    env_keep = <span class="string">"COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR                         LS_COLORS MAIL PS1 PS2 QTDIR USERNAME                         LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION                         LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC                         LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS                         _XKB_CHARSET XAUTHORITY"</span></div><div class="line"><span class="preprocessor">#</span></div><div class="line">root    ALL=(ALL)   ALL</div><div class="line">%sysadmin    ALL=(ALL)   NOPASSWD: ALL</div></pre></td></tr></table></figure>
+
+<h3 id="配置文件解说">配置文件解说</h3>
+<pre><code>jorge ALL=(root) <span class="regexp">/usr/</span>bin<span class="regexp">/find,/</span>bin<span class="regexp">/rm</span>
+</code></pre><ul>
+<li>第一栏规定它的适用对象：可以是用户也可以是组，这里是用户jorge,如果是组的话，就需要使用%百分号开头。</li>
+<li>第二栏指定该规则的适用主机，当再多个系统之间部署sudo环境的情况下，会使用到，这里的ALL代表所有的主机<br>，但是如果不想将sudo部署到多个系统的情况下，这一栏就换成相应的主机名</li>
+<li>第三栏的值是放在括号内，指出第一栏规定的用户能够以何种身份来执行命令。本例中，该值设为root，这意味着用户<br>jorge能够以root用户的身份来运行后面列出的命令。该值也可以设成通配符ALL,jorge便能作为系统中的任何用户<br>来执行列出的命令了。</li>
+<li>最后一栏是使用逗号分开的命令表，这些命令能被第一栏规定的用户以第三栏指出的身份来运行它们。本例中，该配置<br>允许Jorege作为超级用户运行./usr/bin/find和 /bin/rm这两个命令。需要指出的是，这里列出的命令一定要使用绝对路径。<br>如果想让用户作为超级用户不必输入密码就能执行Kill命令，以便用户能立刻杀死一个失控的进程。在命令前边加上NOPASSWD属性即可。<br>例如：<br>  jorge ALL=(root) NOPASSWD:/usr/bin/find,/bin/rm<h3 id="将多个命令放在一起">将多个命令放在一起</h3>
+   Cmnd_Alias  PUSH=/usr/bin/vim,/sbin/ifconfig<br>  zhangwenbo    ALL=(ALL)   NOPASSWD: PUSH</li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2015-01-16T07:44:31.000Z"><a href="/2015/01/16/linux营救模式/">1月 16 2015</a></time>
       
       
@@ -413,48 +458,6 @@
 
 
 
-  <article class="post">
-  
-  <div class="post-content">
-    <header>
-      
-        <div class="icon"></div>
-        <time datetime="2014-11-01T07:52:04.000Z"><a href="/2014/11/01/curl命令常用参数的使用/">11月 1 2014</a></time>
-      
-      
-  
-    <h1 class="title"><a href="/2014/11/01/curl命令常用参数的使用/"></a></h1>
-  
-
-    </header>
-    <div class="entry">
-      
-        <h1 id="curl命令常用参数的使用">curl命令常用参数的使用</h1>
-<h3 id="开启gzip请求(指定请求头)">开启gzip请求(指定请求头)</h3>
-<pre><code>curl -<span class="constant">I</span>  <span class="symbol">http:</span>/<span class="regexp">/www.sina.com.cn/</span> -<span class="constant">H</span> <span class="constant">Accept</span>-<span class="constant">Encoding</span><span class="symbol">:gzip</span>,defalte
-</code></pre><h3 id="监控网页的响应时间">监控网页的响应时间</h3>
-<pre><code>curl -o /dev/null -s -w <span class="string">"time_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}\n"</span> <span class="string">"http://www.kklinux.com"</span>
-</code></pre>
-      
-    </div>
-    <footer>
-      
-        
-          <div class="alignleft">
-            <a href="/2014/11/01/curl命令常用参数的使用/#more" class="more-link">阅读全文</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
-
-
 
 <nav id="pagination">
   
@@ -495,6 +498,8 @@
     <li><a href="/categories/pic/">pic</a><small>1</small></li>
   
     <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+    <li><a href="/categories/sudoer/">sudoer</a><small>1</small></li>
   
     <li><a href="/categories/命令/">命令</a><small>2</small></li>
   
@@ -545,6 +550,8 @@
   
     <li><a href="/tags/redis/">redis</a><small>1</small></li>
   
+    <li><a href="/tags/sudoer/">sudoer</a><small>1</small></li>
+  
     <li><a href="/tags/website/">website</a><small>1</small></li>
   
     <li><a href="/tags/wget/">wget</a><small>1</small></li>
@@ -575,7 +582,7 @@
 <div class="widget tagcloud">
   <h3 class="title">标签云</h3>
   <div class="entry">
-    <a href="/tags/DNS/" style="font-size: 13.33px;">DNS</a><a href="/tags/cmd/" style="font-size: 13.33px;">cmd</a><a href="/tags/docker/" style="font-size: 13.33px;">docker</a><a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a><a href="/tags/kvm/" style="font-size: 13.33px;">kvm</a><a href="/tags/mongo/" style="font-size: 16.67px;">mongo</a><a href="/tags/mysql/" style="font-size: 13.33px;">mysql</a><a href="/tags/news/" style="font-size: 10.00px;">news</a><a href="/tags/nginx/" style="font-size: 13.33px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/pic/" style="font-size: 13.33px;">pic</a><a href="/tags/pypi/" style="font-size: 13.33px;">pypi</a><a href="/tags/redis/" style="font-size: 13.33px;">redis</a><a href="/tags/website/" style="font-size: 13.33px;">website</a><a href="/tags/wget/" style="font-size: 13.33px;">wget</a><a href="/tags/工具/" style="font-size: 13.33px;">工具</a><a href="/tags/文章/" style="font-size: 13.33px;">文章</a><a href="/tags/泄露信息/" style="font-size: 10.00px;">泄露信息</a><a href="/tags/磁盘/" style="font-size: 13.33px;">磁盘</a><a href="/tags/网址/" style="font-size: 10.00px;">网址</a><a href="/tags/营救模式/" style="font-size: 13.33px;">营救模式</a><a href="/tags/虚拟机/" style="font-size: 16.67px;">虚拟机</a><a href="/tags/运维/" style="font-size: 13.33px;">运维</a><a href="/tags/面试/" style="font-size: 13.33px;">面试</a>
+    <a href="/tags/DNS/" style="font-size: 13.33px;">DNS</a><a href="/tags/cmd/" style="font-size: 13.33px;">cmd</a><a href="/tags/docker/" style="font-size: 13.33px;">docker</a><a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a><a href="/tags/kvm/" style="font-size: 13.33px;">kvm</a><a href="/tags/mongo/" style="font-size: 16.67px;">mongo</a><a href="/tags/mysql/" style="font-size: 13.33px;">mysql</a><a href="/tags/news/" style="font-size: 10.00px;">news</a><a href="/tags/nginx/" style="font-size: 13.33px;">nginx</a><a href="/tags/php/" style="font-size: 20.00px;">php</a><a href="/tags/pic/" style="font-size: 13.33px;">pic</a><a href="/tags/pypi/" style="font-size: 13.33px;">pypi</a><a href="/tags/redis/" style="font-size: 13.33px;">redis</a><a href="/tags/sudoer/" style="font-size: 13.33px;">sudoer</a><a href="/tags/website/" style="font-size: 13.33px;">website</a><a href="/tags/wget/" style="font-size: 13.33px;">wget</a><a href="/tags/工具/" style="font-size: 13.33px;">工具</a><a href="/tags/文章/" style="font-size: 13.33px;">文章</a><a href="/tags/泄露信息/" style="font-size: 10.00px;">泄露信息</a><a href="/tags/磁盘/" style="font-size: 13.33px;">磁盘</a><a href="/tags/网址/" style="font-size: 10.00px;">网址</a><a href="/tags/营救模式/" style="font-size: 13.33px;">营救模式</a><a href="/tags/虚拟机/" style="font-size: 16.67px;">虚拟机</a><a href="/tags/运维/" style="font-size: 13.33px;">运维</a><a href="/tags/面试/" style="font-size: 13.33px;">面试</a>
   </div>
 </div>
 
